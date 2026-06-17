@@ -329,22 +329,45 @@ async function fetchData() {
 
 async function saveEdit() {
   const i = parseInt(document.getElementById('editIndex').value);
-  const original = rectData[i];
+  const originalData = rectData[i]; // Data asli dari Fetch
+  
+  if (!originalData || !originalData.sheetRow) {
+    alert("Error: Indeks baris spreadsheet tidak ditemukan.");
+    return;
+  }
+
   const payload = {
     action: "updateRect",
     data: {
-      sheetRow: original.sheetRow,
+      sheetRow: originalData.sheetRow, // Menggunakan nomor baris asli (misal: 6, 7, dsb)
       status: document.getElementById('editStatus').value === "service" ? "In Service" : "Unservice",
-      voltMin: parseFloat(document.getElementById('editVoltMin').value),
-      voltMax: parseFloat(document.getElementById('editVoltMax').value),
-      calibNo: document.getElementById('editCalibNo').value,
+      voltMin: parseFloat(document.getElementById('editVoltMin').value) || 0,
+      voltMax: parseFloat(document.getElementById('editVoltMax').value) || 0,
+      calibNo: document.getElementById('editCalibNo').value || "-",
+      // Mengirimkan string tanggal YYYY-MM-DD
+      calibDate: document.getElementById('editCalibDate').value, 
       dueDate: document.getElementById('editDueDate').value
     }
   };
+
   showLoading(true);
-  await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
-  closeEditModal();
-  fetchData();
+  try {
+    const response = await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    const text = await response.text();
+    console.log("Response:", text);
+    
+    closeEditModal();
+    await fetchData(); // Ambil data terbaru dari sheet
+    showSaveIndicator();
+  } catch (e) {
+    console.error("Save Error:", e);
+    alert("Gagal menyimpan ke Google Sheets. Cek koneksi atau Deployment GAS.");
+  } finally {
+    showLoading(false);
+  }
 }
 
 async function saveLog() {
