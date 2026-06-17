@@ -127,7 +127,10 @@
   .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: flex-end; gap: 8px; }
 
   .footer { text-align: center; padding: 20px; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border2); margin-top: 32px; }
-
+  .voltage-bar { margin: 10px 0; }
+  .vb-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+  .vb-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .vb-fill { height: 100%; background: var(--green); transition: width 0.5s; }
   @media (max-width: 768px) {
     .rect-grid { grid-template-columns: 1fr; }
     .summary-bar { grid-template-columns: repeat(2,1fr); }
@@ -372,11 +375,30 @@ function renderCards() {
   let inService = 0, unservice = 0, overdue = 0;
 
   rectData.forEach((r, i) => {
+    // Hitung sisa hari dan status counts
     if (r.status === 'service') inService++; else unservice++;
+    
+    // --- PENERAPAN LOGIKA BARU ---
     const days = daysUntil(r.dueDate);
     if (days < 0) overdue++;
 
-    const dueDateClass = days < 0 ? 'danger' : (days <= 30 ? 'warn' : 'ok');
+    // Tentukan warna dan teks status untuk tampilan
+    let dueDateClass = 'ok';
+    let dueDateText = `${formatDate(r.dueDate)}`;
+
+    if (days < 0) { 
+        dueDateClass = 'danger'; 
+        dueDateText += ' ⚠ OVERDUE'; 
+    } else if (days <= 30) { 
+        dueDateClass = 'warn'; 
+        dueDateText += ` (${days}d)`; 
+    } else {
+        dueDateText += ` (${days}d)`;
+    }
+
+    // Hitung persentase bar (asumsi max scale 50V untuk visualisasi)
+    const voltPct = Math.min(100, Math.round((r.voltMax / 50) * 100));
+    // --- AKHIR LOGIKA BARU ---
 
     const card = document.createElement('div');
     card.className = `rect-card ${r.status}`;
@@ -385,26 +407,54 @@ function renderCards() {
         <div><div class="card-id">${r.id}</div><div class="card-name">${r.name}</div></div>
         <div class="status-badge ${r.status}"><div class="status-dot"></div>${r.status === 'service' ? 'IN SERVICE' : 'UNSERVICE'}</div>
       </div>
+      
       <div class="sketch-area">${sketches[r.name] || '<p style="color:var(--text3); font-size:10px; margin-top:60px;">NO SKETCH AVAILABLE</p>'}</div>
+      
       <div class="card-body">
         <div class="info-grid">
-          <div class="info-item"><div class="info-label">Voltage Range</div><div class="info-value highlight">${r.voltMin}–${r.voltMax} VDC</div></div>
-          <div class="info-item"><div class="info-label">Current Range</div><div class="info-value highlight">${r.currMin}–${r.currMax} A</div></div>
-          <div class="info-item" style="grid-column:span 2"><div class="info-label">Due Date Calibration</div><div class="info-value ${dueDateClass}">${formatDate(r.dueDate)} (${days}d)</div></div>
+          <div class="info-item">
+            <div class="info-label">Voltage Range</div>
+            <div class="info-value highlight">${r.voltMin}–${r.voltMax} VDC</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Current Range</div>
+            <div class="info-value highlight">${r.currMin}–${r.currMax} A</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Calib. Reg. No.</div>
+            <div class="info-value">${r.calibNo || '-'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Calibration Date</div>
+            <div class="info-value">${formatDate(r.calibDate)}</div>
+          </div>
+          <div class="info-item" style="grid-column:span 2">
+            <div class="info-label">Due Date Calibration</div>
+            <div class="info-value ${dueDateClass}">${dueDateText}</div>
+          </div>
         </div>
+
+        <!-- Voltage Range Indicator Bar -->
+        <div class="voltage-bar">
+          <div class="vb-label"><span>Voltage Range Indicator</span><span>${r.voltMax}V</span></div>
+          <div class="vb-track"><div class="vb-fill" style="width:${voltPct}%"></div></div>
+        </div>
+
         <div class="damage-box ${r.damage === 'None' ? 'none' : ''}">
           <div class="dmg-label">⚠ Damage Detail</div>
           <div class="dmg-text">${r.damage}</div>
         </div>
       </div>
+
       <div class="card-footer">
-        <button class="btn primary" onclick="openEdit(${i})">✎ Edit</button>
-        <button class="btn danger" onclick="openAddLogForUnit('${r.id}')">+ Log</button>
+        <button class="btn primary" onclick="openEdit(${i})">✎ Edit Data</button>
+        <button class="btn danger" onclick="openAddLogForUnit('${r.id}', '${r.name}')">+ Log Kerusakan</button>
       </div>
     `;
     grid.appendChild(card);
   });
 
+  // Update Summary Dashboard
   document.getElementById('sumTotal').textContent = rectData.length;
   document.getElementById('sumService').textContent = inService;
   document.getElementById('sumUnservice').textContent = unservice;
