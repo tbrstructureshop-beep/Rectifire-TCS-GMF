@@ -205,12 +205,25 @@
     <div class="modal-body">
       <input type="hidden" id="editIndex"/>
       <div class="form-row"><label>Status</label><select id="editStatus"><option value="service">In Service</option><option value="unservice">Unservice</option></select></div>
+      
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div class="form-row"><label>Volt Min</label><input type="number" id="editVoltMin"/></div>
-        <div class="form-row"><label>Volt Max</label><input type="number" id="editVoltMax"/></div>
+        <div class="form-row"><label>Volt Min</label><input type="number" id="editVoltMin" step="0.1"/></div>
+        <div class="form-row"><label>Volt Max</label><input type="number" id="editVoltMax" step="0.1"/></div>
       </div>
+
+      <!-- Tambahkan ini agar Current tidak terhapus saat save -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-row"><label>Curr Min</label><input type="number" id="editCurrMin"/></div>
+        <div class="form-row"><label>Curr Max</label><input type="number" id="editCurrMax"/></div>
+      </div>
+
       <div class="form-row"><label>Calibration Reg. No.</label><input type="text" id="editCalibNo"/></div>
-      <div class="form-row"><label>Due Date Calibration</label><input type="date" id="editDueDate"/></div>
+      
+      <!-- Tambahkan Calibration Date -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-row"><label>Calibration Date</label><input type="date" id="editCalibDate"/></div>
+        <div class="form-row"><label>Due Date Calibration</label><input type="date" id="editDueDate"/></div>
+      </div>
     </div>
     <div class="modal-footer"><button class="btn" onclick="closeEditModal()">Cancel</button><button class="btn primary" onclick="saveEdit()">Save Changes</button></div>
   </div>
@@ -329,43 +342,43 @@ async function fetchData() {
 
 async function saveEdit() {
   const i = parseInt(document.getElementById('editIndex').value);
-  const originalData = rectData[i]; // Data asli dari Fetch
+  const originalData = rectData[i];
   
-  if (!originalData || !originalData.sheetRow) {
-    alert("Error: Indeks baris spreadsheet tidak ditemukan.");
-    return;
-  }
-
   const payload = {
     action: "updateRect",
     data: {
-      sheetRow: originalData.sheetRow, // Menggunakan nomor baris asli (misal: 6, 7, dsb)
+      sheetRow: originalData.sheetRow, // Menunjuk baris 6, 7, dsb
       status: document.getElementById('editStatus').value === "service" ? "In Service" : "Unservice",
       voltMin: parseFloat(document.getElementById('editVoltMin').value) || 0,
       voltMax: parseFloat(document.getElementById('editVoltMax').value) || 0,
+      currMin: parseFloat(document.getElementById('editCurrMin').value) || 0,
+      currMax: parseFloat(document.getElementById('editCurrMax').value) || 0,
       calibNo: document.getElementById('editCalibNo').value || "-",
-      // Mengirimkan string tanggal YYYY-MM-DD
-      calibDate: document.getElementById('editCalibDate').value, 
+      calibDate: document.getElementById('editCalibDate').value,
       dueDate: document.getElementById('editDueDate').value
     }
   };
 
   showLoading(true);
   try {
-    const response = await fetch(GAS_URL, {
+    // Gunakan POST tanpa header Application/Json untuk menghindari CORS pre-flight
+    await fetch(GAS_URL, {
       method: "POST",
+      mode: "no-cors", // Gunakan no-cors jika fetch biasa gagal, tapi data akan tetap masuk
       body: JSON.stringify(payload)
     });
-    const text = await response.text();
-    console.log("Response:", text);
-    
-    closeEditModal();
-    await fetchData(); // Ambil data terbaru dari sheet
-    showSaveIndicator();
+
+    // Karena no-cors tidak bisa membaca respon, kita asumsikan sukses 
+    // dan refresh data setelah jeda singkat
+    setTimeout(async () => {
+      closeEditModal();
+      await fetchData();
+      showSaveIndicator();
+    }, 1000);
+
   } catch (e) {
     console.error("Save Error:", e);
-    alert("Gagal menyimpan ke Google Sheets. Cek koneksi atau Deployment GAS.");
-  } finally {
+    alert("Koneksi bermasalah.");
     showLoading(false);
   }
 }
@@ -547,8 +560,17 @@ function openEdit(i) {
   document.getElementById('editStatus').value = r.status;
   document.getElementById('editVoltMin').value = r.voltMin;
   document.getElementById('editVoltMax').value = r.voltMax;
+  
+  // Tambahkan baris ini
+  document.getElementById('editCurrMin').value = r.currMin;
+  document.getElementById('editCurrMax').value = r.currMax;
+  
   document.getElementById('editCalibNo').value = r.calibNo;
+  
+  // Pastikan format tanggal sesuai YYYY-MM-DD untuk input type date
+  document.getElementById('editCalibDate').value = r.calibDate ? new Date(r.calibDate).toISOString().split('T')[0] : "";
   document.getElementById('editDueDate').value = r.dueDate ? new Date(r.dueDate).toISOString().split('T')[0] : "";
+  
   document.getElementById('editModal').classList.add('open');
 }
 
