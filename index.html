@@ -607,8 +607,53 @@ function editLogFiltered(idx) {
   alert("Fungsi Edit Log akan segera tersedia. Untuk saat ini, silakan gunakan Google Sheets.");
 }
 
-function deleteLogFiltered(idx) {
-  alert("Untuk menghapus log, silakan hapus baris langsung di Google Sheets agar data tetap sinkron.");
+async function deleteLogFiltered(idx) {
+  // 1. Dapatkan data yang difilter saat ini
+  const filterUnit = document.getElementById('filterUnit').value;
+  let filtered = logData.filter(l => {
+    if (!l.unitId) return false;
+    return filterUnit ? l.unitId === filterUnit : true;
+  });
+  
+  const targetData = filtered[idx];
+
+  // 2. Konfirmasi penghapusan
+  if (!confirm(`Apakah Anda yakin ingin menghapus log untuk unit ${targetData.unit}?`)) {
+    return;
+  }
+
+  // 3. Tampilkan loading spinner
+  showLoading(true);
+
+  const payload = {
+    action: "deleteLog",
+    sheetRow: targetData.sheetRow // Nomor baris yang didapat dari Google Sheets
+  };
+
+  try {
+    // 4. Kirim permintaan ke Google Apps Script
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors", // Mode no-cors untuk menghindari masalah pre-flight
+      body: JSON.stringify(payload)
+    });
+
+    // 5. Beri jeda singkat lalu refresh data
+    setTimeout(async () => {
+      await fetchData(); // Mengambil data terbaru dari Google Sheets
+      showLoading(false);
+      // Notifikasi sukses (Opsional)
+      const elIndicator = document.getElementById('saveIndicator');
+      elIndicator.textContent = "✔ Log Berhasil Dihapus";
+      elIndicator.style.opacity = "1";
+      setTimeout(() => elIndicator.style.opacity = "0", 3000);
+    }, 1500);
+
+  } catch (e) {
+    console.error("Delete Error:", e);
+    alert("Gagal menghapus data. Silakan coba lagi.");
+    showLoading(false);
+  }
 }
 
   // Mengembalikan modal tampilan detail yang rapi (bukan alert)
