@@ -42,7 +42,9 @@
     gap: 15px;
     backdrop-filter: blur(2px);
   }
-
+  .log-action-btns { display: flex; gap: 6px; justify-content: center; }
+  .icon-btn { cursor: pointer; background: none; border: none; color: var(--text3); font-size: 16px; padding: 2px; transition: color 0.15s; }
+  .icon-btn:hover { color: var(--text); }
   .spinner {
     width: 50px;
     height: 50px;
@@ -553,28 +555,99 @@ function renderLogbook() {
   const tbody = document.getElementById('logbookBody');
   const filterUnit = document.getElementById('filterUnit').value;
 
+  // 1. Filter data: Buang baris kosong & jalankan filter dropdown unit
   let filtered = logData.filter(l => {
-    if (!l.unitId) return false; // Buang baris kosong
+    if (!l.unitId) return false; // Buang baris kosong (Ghost Rows)
     return filterUnit ? l.unitId === filterUnit : true;
   });
 
+  // 2. Tampilkan pesan jika tidak ada data
   if (filtered.length === 0) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text3);">No valid log entries.</td></tr>';
     return;
   }
 
-  tbody.innerHTML = filtered.map(l => `
+  // 3. Render baris tabel dengan tombol aksi lengkap
+  // Kita gunakan index (idx) dari array 'filtered' sebagai referensi tombol
+  tbody.innerHTML = filtered.map((l, idx) => `
     <tr>
       <td style="font-family:monospace; font-size:11px;">${formatDate(l.date)}</td>
       <td><strong>${l.unit}</strong><br><small style="color:var(--text3)">${l.unitId}</small></td>
-      <td><span class="tag tag-${l.severity}">${l.severity}</span></td>
+      <td><span class="tag tag-${l.severity.toLowerCase()}">${l.severity}</span></td>
       <td style="max-width:250px;">${l.damage}</td>
       <td>${l.reporter}</td>
       <td style="font-size:11px; color:var(--text2);">${l.action || '-'}</td>
       <td><span class="tag tag-${l.status.toLowerCase()}">${l.status}</span></td>
-      <td><button class="icon-btn" onclick="alert('${l.damage}')" style="cursor:pointer; background:none; border:none; color:var(--blue);">👁</button></td>
+      <td>
+        <div class="log-action-btns">
+          <button class="icon-btn" title="View" onclick="viewLogDetailFiltered(${idx})">👁</button>
+          <button class="icon-btn" title="Edit" onclick="editLogFiltered(${idx})">✎</button>
+          <button class="icon-btn" title="Delete" onclick="deleteLogFiltered(${idx})" style="color:var(--red);">🗑</button>
+        </div>
+      </td>
     </tr>
   `).join('');
+}
+
+/** 
+ * Tambahkan helper di bawah ini agar tombol berfungsi 
+ * karena data yang diklik berasal dari list yang sudah difilter
+ */
+function viewLogDetailFiltered(idx) {
+  const filterUnit = document.getElementById('filterUnit').value;
+  let filtered = logData.filter(l => {
+    if (!l.unitId) return false;
+    return filterUnit ? l.unitId === filterUnit : true;
+  });
+  const data = filtered[idx];
+  alert(`Unit: ${data.unit}\nDetail: ${data.damage}\nAction: ${data.action || '-'}`);
+}
+
+function editLogFiltered(idx) {
+  alert("Fungsi Edit Log akan segera tersedia. Untuk saat ini, silakan gunakan Google Sheets.");
+}
+
+function deleteLogFiltered(idx) {
+  alert("Untuk menghapus log, silakan hapus baris langsung di Google Sheets agar data tetap sinkron.");
+}
+
+  // Mengembalikan modal tampilan detail yang rapi (bukan alert)
+function viewLog(idx) {
+  const log = logData[idx];
+  if (!log) return;
+  
+  const severityLabel = log.severity.charAt(0).toUpperCase() + log.severity.slice(1);
+  document.getElementById('viewModalBody').innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+      <div><div style="font-size:10px; text-transform:uppercase; color:#6E7681; margin-bottom:3px;">Unit</div><div style="font-family:monospace;">${log.unit}</div></div>
+      <div><div style="font-size:10px; text-transform:uppercase; color:#6E7681; margin-bottom:3px;">Date</div><div style="font-family:monospace;">${formatDate(log.date)}</div></div>
+      <div><div style="font-size:10px; text-transform:uppercase; color:#6E7681; margin-bottom:3px;">Severity</div><span class="tag tag-${log.severity}">${severityLabel}</span></div>
+      <div><div style="font-size:10px; text-transform:uppercase; color:#6E7681; margin-bottom:3px;">Reporter</div><div>${log.reporter}</div></div>
+    </div>
+    <div style="margin-bottom:12px;"><div style="font-size:10px; text-transform:uppercase; color:#6E7681; margin-bottom:4px;">Damage Detail</div><div style="background:#0A0E13; border:1px solid #30363D; border-radius:6px; padding:10px; font-size:13px; line-height:1.6;">${log.damage}</div></div>
+    <div><div style="font-size:10px; text-transform:uppercase; color:#6E7681; margin-bottom:4px;">Action Taken</div><div style="background:#0A0E13; border:1px solid #30363D; border-radius:6px; padding:10px; font-size:13px; line-height:1.6;">${log.action || '—'}</div></div>
+  `;
+  document.getElementById('viewModal').classList.add('open');
+}
+
+// Mengisi form modal Logbook untuk keperluan edit
+function editLog(idx) {
+  const log = logData[idx];
+  openAddLog(); // Membuka modal add log
+  document.getElementById('logUnit').value = log.unitId;
+  document.getElementById('logSeverity').value = log.severity.toLowerCase();
+  document.getElementById('logDamage').value = log.damage;
+  document.getElementById('logReporter').value = log.reporter;
+  document.getElementById('logAction').value = log.action;
+  // Catatan: Karena backend GAS saat ini hanya memiliki fungsi 'addLog' (menambah baris),
+  // tombol 'Save Log' akan menambah baris baru di Spreadsheet.
+}
+
+function deleteLog(idx) {
+  if(confirm("Hapus log ini dari database? (Catatan: Anda harus menghapus manual di baris Spreadsheet untuk sinkronisasi penuh)")) {
+    // Fungsi delete membutuhkan update pada kode GAS (backend) untuk menghapus baris spesifik.
+    alert("Gunakan Google Sheets langsung untuk menghapus baris agar data tetap sinkron.");
+  }
 }
 
 // ========== HELPERS ==========
