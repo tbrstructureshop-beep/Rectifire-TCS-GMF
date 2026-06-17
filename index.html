@@ -567,22 +567,45 @@ function renderCards() {
 
 function renderLogbook() {
   const tbody = document.getElementById('logbookBody');
-  if (logData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">Belum ada data logbook.</td></tr>';
+  const filterUnit = document.getElementById('filterUnit').value;
+  const filterSev = document.getElementById('filterSeverity').value;
+
+  // Filter data berdasarkan dropdown (jika ada)
+  let filtered = logData.filter(l => {
+    // Pastikan l.unitId ada (tidak null/undefined)
+    if (!l.unitId) return false;
+    
+    const matchUnit = filterUnit ? l.unitId === filterUnit : true;
+    const matchSev = filterSev ? l.severity === filterSev : true;
+    return matchUnit && matchSev;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#8B949E; font-style:italic;">No valid log entries found.</td></tr>';
     return;
   }
-  tbody.innerHTML = logData.map(l => `
+
+  tbody.innerHTML = filtered.map(l => `
     <tr>
-      <td style="font-family:monospace; font-size:11px;">${formatDate(l.date)}</td>
-      <td><strong>${l.unit}</strong></td>
-      <td><span class="tag tag-${l.severity}">${l.severity}</span></td>
-      <td>${l.damage}</td>
-      <td>${l.reporter}</td>
-      <td>${l.action || '-'}</td>
-      <td><span class="tag tag-${l.status}">${l.status}</span></td>
-      <td><button class="icon-btn" onclick="viewLogDetail('${l.unit}', '${l.damage}')">👁</button></td>
+      <td style="font-family:monospace; font-size:11px; color:#8B949E;">${formatDate(l.date)}</td>
+      <td><strong>${l.unit || '-'}</strong> <br><small style="color:#6E7681">${l.unitId || ''}</small></td>
+      <td><span class="tag tag-${l.severity}">${l.severity || 'info'}</span></td>
+      <td style="max-width:250px; line-height:1.4;">${l.damage || '-'}</td>
+      <td style="color:#8B949E;">${l.reporter || '-'}</td>
+      <td style="max-width:150px; font-size:11px; color:#8B949E;">${l.action || '-'}</td>
+      <td><span class="tag tag-${l.status}">${l.status || 'open'}</span></td>
+      <td>
+        <div class="log-action-btns">
+          <button class="icon-btn" title="View Detail" onclick="viewLogDetail('${l.unit}', \`${l.damage}\`)">👁</button>
+        </div>
+      </td>
     </tr>
   `).join('');
+}
+
+// Tambahkan fungsi helper sederhana jika belum ada untuk Modal Detail
+function viewLogDetail(unit, damage) {
+  alert("Unit: " + unit + "\n\nDamage Detail:\n" + damage);
 }
 
 function populateUnitFilter() {
