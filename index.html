@@ -75,11 +75,10 @@
   .status-dot { width: 6px; height: 6px; border-radius: 50%; }
   .status-badge.service .status-dot { background: var(--green); animation: pulse-green 2s infinite; }
   .status-badge.unservice .status-dot { background: var(--red); animation: pulse-red 2s infinite; }
-  @keyframes pulse-red { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
 
   /* SVG SKETCH AREA */
-  .sketch-area { padding: 12px 16px; background: #0A0E13; border-bottom: 1px solid var(--border2); display: flex; justify-content: center; }
-  .sketch-area svg { display: block; }
+  .sketch-area { padding: 12px 16px; background: #0A0E13; border-bottom: 1px solid var(--border2); display: flex; justify-content: center; min-height: 142px; }
+  .sketch-area svg { display: block; max-width: 100%; height: auto; }
 
   /* CARD BODY */
   .card-body { padding: 12px 16px; }
@@ -91,14 +90,9 @@
   .info-item .info-value.ok { color: var(--green); }
   .info-item .info-value.danger { color: var(--red); }
 
-  .voltage-bar { margin: 10px 0; }
-  .voltage-bar .vb-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
-  .voltage-bar .vb-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .voltage-bar .vb-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #1a6b3a, var(--green)); }
-
-  .damage-box { background: #16100A; border: 1px solid #3D2B10; border-radius: 6px; padding: 8px 10px; margin-top: 8px; }
+  .damage-box { background: #16100A; border: 1px solid #3D2B10; border-radius: 6px; padding: 8px 10px; margin-top: 8px; min-height: 50px; }
   .damage-box .dmg-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #7A5020; margin-bottom: 4px; }
-  .damage-box .dmg-text { font-size: 12px; color: var(--amber); line-height: 1.5; }
+  .damage-box .dmg-text { font-size: 11px; color: var(--amber); line-height: 1.4; }
   .damage-box.none { background: var(--surface2); border-color: var(--border2); }
   .damage-box.none .dmg-label { color: var(--text3); }
   .damage-box.none .dmg-text { color: var(--text2); font-style: italic; }
@@ -107,82 +101,46 @@
   .btn { cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 5px; padding: 5px 12px; font-size: 11px; font-family: inherit; transition: all 0.15s; }
   .btn:hover { background: var(--border); }
   .btn.primary { background: var(--blue-bg); border-color: #1A3A6B; color: var(--blue); }
-  .btn.primary:hover { background: #0F1D33; }
   .btn.danger { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
 
-  /* EDIT MODAL */
+  /* LOGBOOK TABLE */
+  .logbook-container { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .logbook-header { padding: 14px 20px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
+  .logbook-header h2 { font-size: 14px; font-weight: 600; }
+  .log-table { width: 100%; border-collapse: collapse; }
+  .log-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border2); background: #111519; }
+  .log-table td { padding: 12px 16px; border-bottom: 1px solid var(--border2); font-size: 12px; vertical-align: top; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+  .tag-critical { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); }
+  .tag-minor { color: var(--amber); background: var(--amber-bg); border: 1px solid #3D2B10; }
+  .tag-resolved { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+
+  /* MODALS */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
   .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
-  .modal-header h3 { font-size: 15px; font-weight: 600; }
-  .modal-close { cursor: pointer; background: none; border: none; color: var(--text2); font-size: 20px; line-height: 1; padding: 0 4px; }
-  .modal-close:hover { color: var(--text); }
   .modal-body { padding: 20px; }
   .form-row { margin-bottom: 14px; }
-  .form-row label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 5px; }
-  .form-row input, .form-row select, .form-row textarea {
-    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-    color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 10px;
-  }
-  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--blue); }
-  .form-row textarea { resize: vertical; min-height: 60px; }
-  .form-row select option { background: var(--surface); }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+  .form-row input, .form-row select, .form-row textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px 10px; font-size: 13px; }
   .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: flex-end; gap: 8px; }
 
-  /* LOGBOOK */
-  .logbook-container { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .logbook-header { padding: 14px 20px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
-  .logbook-header h2 { font-size: 14px; font-weight: 600; }
-  .logbook-filters { display: flex; gap: 8px; }
-  .logbook-filters select, .logbook-filters input { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-family: inherit; font-size: 12px; padding: 5px 8px; }
-  .log-table { width: 100%; border-collapse: collapse; }
-  .log-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border2); background: #111519; }
-  .log-table td { padding: 10px 16px; border-bottom: 1px solid var(--border2); font-size: 12px; vertical-align: top; }
-  .log-table tr:last-child td { border-bottom: none; }
-  .log-table tr:hover td { background: var(--surface2); }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .tag-critical { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); }
-  .tag-minor { color: var(--amber); background: var(--amber-bg); border: 1px solid #3D2B10; }
-  .tag-resolved { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
-  .log-action-btns { display: flex; gap: 6px; }
-  .icon-btn { cursor: pointer; background: none; border: none; color: var(--text3); font-size: 16px; padding: 2px; transition: color 0.15s; }
-  .icon-btn:hover { color: var(--text); }
-  .empty-row td { text-align: center; color: var(--text3); font-style: italic; padding: 32px; }
-
-  /* ADD LOG MODAL */
-  .add-log-btn { cursor: pointer; background: var(--blue-bg); border: 1px solid #1A3A6B; color: var(--blue); border-radius: 6px; padding: 7px 14px; font-size: 12px; font-family: inherit; transition: all 0.15s; }
-  .add-log-btn:hover { background: #0F1D33; }
-
-  /* FOOTER */
   .footer { text-align: center; padding: 20px; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border2); margin-top: 32px; }
-
-  /* Overdue highlight */
-  .overdue { color: var(--red) !important; }
-  .due-soon { color: var(--amber) !important; }
 
   @media (max-width: 768px) {
     .rect-grid { grid-template-columns: 1fr; }
     .summary-bar { grid-template-columns: repeat(2,1fr); }
-    .main { padding: 16px; }
   }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-left">
-    <svg class="header-logo" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <svg class="header-logo" viewBox="0 0 40 40">
       <rect width="40" height="40" rx="8" fill="#1F6FEB" opacity="0.15"/>
       <rect x="6" y="14" width="28" height="16" rx="3" fill="none" stroke="#388BFD" stroke-width="1.5"/>
-      <line x1="10" y1="14" x2="10" y2="10" stroke="#388BFD" stroke-width="1.5"/>
-      <line x1="30" y1="14" x2="30" y2="10" stroke="#388BFD" stroke-width="1.5"/>
-      <line x1="8" y1="10" x2="32" y2="10" stroke="#3FB950" stroke-width="1.5"/>
-      <rect x="9" y="17" width="8" height="10" rx="1" fill="#388BFD" opacity="0.4"/>
-      <rect x="23" y="17" width="8" height="10" rx="1" fill="#388BFD" opacity="0.4"/>
-      <line x1="17" y1="22" x2="23" y2="22" stroke="#3FB950" stroke-width="1.5"/>
       <circle cx="20" cy="22" r="2" fill="#3FB950"/>
     </svg>
     <div class="header-title">
@@ -191,63 +149,45 @@
     </div>
   </div>
   <div class="header-right">
-    <div id="saveIndicator" style="font-size:11px;color:#3FB950;font-family:monospace;opacity:0;transition:opacity 0.4s;letter-spacing:0.5px;">✔ Saved</div>
+    <div id="saveIndicator" style="font-size:11px;color:#3FB950;font-family:monospace;opacity:0;transition:opacity 0.4s;">✔ Data Synced</div>
     <div class="live-badge"><div class="live-dot"></div> LIVE</div>
     <div class="clock" id="clock">--:--:--</div>
   </div>
 </div>
 
-<!-- SUMMARY BAR -->
 <div class="summary-bar" id="summaryBar">
-  <div class="summary-item"><div class="label">Total Rectifier</div><div class="value blue" id="sumTotal">5</div></div>
+  <div class="summary-item"><div class="label">Total Rectifier</div><div class="value blue" id="sumTotal">-</div></div>
   <div class="summary-item"><div class="label">In Service</div><div class="value green" id="sumService">-</div></div>
   <div class="summary-item"><div class="label">Unservice</div><div class="value red" id="sumUnservice">-</div></div>
   <div class="summary-item"><div class="label">Overdue Calibration</div><div class="value amber" id="sumOverdue">-</div></div>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="main">
   <div class="section-title">Rectifier Units Overview</div>
-  <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:14px;">
-    <button class="btn primary" onclick="exportRectifierCSV()">⬇ Export Rectifier Data (CSV)</button>
-    <button class="btn primary" onclick="exportLogbookCSV()">⬇ Export Logbook (CSV)</button>
-  </div>
-
-  <!-- RECTIFIER CARDS -->
   <div class="rect-grid" id="rectGrid"></div>
 
-  <!-- LOGBOOK -->
   <div class="section-title">Damage & Maintenance Logbook</div>
   <div class="logbook-container">
     <div class="logbook-header">
       <h2>📋 Logbook Record</h2>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <div class="logbook-filters">
-          <select id="filterUnit" onchange="renderLogbook()">
-            <option value="">All Units</option>
-          </select>
-          <select id="filterSeverity" onchange="renderLogbook()">
-            <option value="">All Severity</option>
-            <option value="critical">Critical</option>
-            <option value="minor">Minor</option>
-            <option value="resolved">Resolved</option>
-          </select>
-        </div>
-        <button class="add-log-btn" onclick="openAddLog()">+ Add Log Entry</button>
-        <button class="add-log-btn" onclick="exportLogbookCSV()">⬇ Export CSV</button>
+      <div style="display:flex; gap:8px;">
+        <select id="filterUnit" onchange="renderLogbook()" style="background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:5px; padding:5px; font-size:12px;">
+          <option value="">All Units</option>
+        </select>
+        <button class="add-log-btn" onclick="openAddLog()" style="cursor:pointer; background:var(--blue-bg); border:1px solid #1A3A6B; color:var(--blue); border-radius:6px; padding:5px 12px; font-size:12px;">+ Add Log</button>
       </div>
     </div>
     <table class="log-table">
       <thead>
         <tr>
-          <th style="width:100px">Date/Time</th>
-          <th style="width:130px">Rectifier Unit</th>
+          <th style="width:100px">Date</th>
+          <th style="width:140px">Rectifier Unit</th>
           <th style="width:90px">Severity</th>
           <th>Damage Detail</th>
           <th style="width:110px">Reported By</th>
-          <th style="width:110px">Action Taken</th>
+          <th style="width:120px">Action Taken</th>
           <th style="width:80px">Status</th>
-          <th style="width:70px">Actions</th>
+          <th style="width:50px">View</th>
         </tr>
       </thead>
       <tbody id="logbookBody"></tbody>
@@ -255,148 +195,117 @@
   </div>
 </div>
 
-<!-- EDIT RECTIFIER MODAL -->
+<!-- MODALS -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
-    <div class="modal-header">
-      <h3 id="editModalTitle">Edit Rectifier Data</h3>
-      <button class="modal-close" onclick="closeEditModal()">×</button>
-    </div>
+    <div class="modal-header"><h3>Edit Rectifier Data</h3><button onclick="closeEditModal()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">×</button></div>
     <div class="modal-body">
       <input type="hidden" id="editIndex"/>
-      <div class="form-row">
-        <label>Status</label>
-        <select id="editStatus">
-          <option value="service">In Service</option>
-          <option value="unservice">Unservice</option>
-        </select>
+      <div class="form-row"><label>Status</label><select id="editStatus"><option value="service">In Service</option><option value="unservice">Unservice</option></select></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-row"><label>Volt Min</label><input type="number" id="editVoltMin"/></div>
+        <div class="form-row"><label>Volt Max</label><input type="number" id="editVoltMax"/></div>
       </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Voltage Min (V)</label>
-          <input type="number" id="editVoltMin"/>
-        </div>
-        <div class="form-row">
-          <label>Voltage Max (V)</label>
-          <input type="number" id="editVoltMax"/>
-        </div>
-      </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Current Min (A)</label>
-          <input type="number" id="editCurrMin"/>
-        </div>
-        <div class="form-row">
-          <label>Current Max (A)</label>
-          <input type="number" id="editCurrMax"/>
-        </div>
-      </div>
-      <div class="form-row">
-        <label>Calibration Reg. No.</label>
-        <input type="text" id="editCalibNo"/>
-      </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Calibration Date</label>
-          <input type="date" id="editCalibDate"/>
-        </div>
-        <div class="form-row">
-          <label>Due Date Calibration</label>
-          <input type="date" id="editDueDate"/>
-        </div>
-      </div>
-      <div class="form-row">
-        <label>Damage Detail</label>
-        <textarea id="editDamage" rows="3" placeholder="Describe damage or write 'None' if no damage..."></textarea>
-      </div>
+      <div class="form-row"><label>Calibration Reg. No.</label><input type="text" id="editCalibNo"/></div>
+      <div class="form-row"><label>Due Date Calibration</label><input type="date" id="editDueDate"/></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeEditModal()">Cancel</button>
-      <button class="btn primary" onclick="saveEdit()">Save Changes</button>
-    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeEditModal()">Cancel</button><button class="btn primary" onclick="saveEdit()">Save Changes</button></div>
   </div>
 </div>
 
-<!-- ADD LOG MODAL -->
 <div class="modal-overlay" id="logModal">
   <div class="modal">
-    <div class="modal-header">
-      <h3>Add Logbook Entry</h3>
-      <button class="modal-close" onclick="closeLogModal()">×</button>
-    </div>
+    <div class="modal-header"><h3>Add Logbook Entry</h3><button onclick="closeLogModal()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">×</button></div>
     <div class="modal-body">
-      <input type="hidden" id="logEditId"/>
-      <div class="form-row">
-        <label>Rectifier Unit</label>
-        <select id="logUnit"></select>
-      </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Date</label>
-          <input type="date" id="logDate"/>
-        </div>
-        <div class="form-row">
-          <label>Severity</label>
-          <select id="logSeverity">
-            <option value="critical">Critical</option>
-            <option value="minor">Minor</option>
-            <option value="resolved">Resolved</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <label>Damage Detail</label>
-        <textarea id="logDamage" rows="3" placeholder="Describe the damage or issue..."></textarea>
-      </div>
-      <div class="form-row">
-        <label>Reported By</label>
-        <input type="text" id="logReporter" placeholder="Name / Employee ID"/>
-      </div>
-      <div class="form-row">
-        <label>Action Taken</label>
-        <textarea id="logAction" rows="2" placeholder="Action taken or pending..."></textarea>
-      </div>
-      <div class="form-row">
-        <label>Status</label>
-        <select id="logStatus">
-          <option value="minor">Open</option>
-          <option value="critical">Critical – Need Immediate Action</option>
-          <option value="resolved">Resolved</option>
-        </select>
-      </div>
+      <div class="form-row"><label>Rectifier Unit</label><select id="logUnit"></select></div>
+      <div class="form-row"><label>Severity</label><select id="logSeverity"><option value="minor">Minor</option><option value="critical">Critical</option><option value="resolved">Resolved</option></select></div>
+      <div class="form-row"><label>Damage Detail</label><textarea id="logDamage" rows="3"></textarea></div>
+      <div class="form-row"><label>Reported By</label><input type="text" id="logReporter"/></div>
+      <div class="form-row"><label>Action Taken</label><textarea id="logAction" rows="2"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeLogModal()">Cancel</button>
-      <button class="btn primary" onclick="saveLog()">Save Entry</button>
-    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeLogModal()">Cancel</button><button class="btn primary" onclick="saveLog()">Save Log</button></div>
   </div>
 </div>
 
-<!-- VIEW LOG MODAL -->
-<div class="modal-overlay" id="viewModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Log Entry Detail</h3>
-      <button class="modal-close" onclick="document.getElementById('viewModal').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body" id="viewModalBody"></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="document.getElementById('viewModal').classList.remove('open')">Close</button>
-    </div>
-  </div>
-</div>
-
-<div class="footer">Rectifier Monitoring System v1.0 · Electroplating Facility · Data updates in real-time</div>
+<div class="footer">Rectifier Monitoring System v1.1 · Electroplating Facility · Real-time Sheets Sync</div>
 
 <script>
-// URL Web App GAS Anda
+// URL WEB APP GAS ANDA
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwWa-zhq12iprT5ZpnvzrUU9FjChlJ5wjP8jdex4SheQ84oRbZ4sRJBdR25ZR2NEpVbMQ/exec";
 
-// ========== STATE DATA ==========
 let rectData = [];
 let logData = [];
 
-// ========== FETCH DATA DARI GOOGLE SHEET ==========
+// ========== SVG SKETCHES (GUNA NAMA UNIT SEBAGAI KEY) ==========
+const sketches = {
+  "Nickel Strike": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="20" width="70" height="70" rx="4" fill="none" stroke="#388BFD" stroke-width="1.5"/>
+    <text x="45" y="10" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="14" y="28" width="62" height="14" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="1"/>
+    <text x="45" y="39" fill="#3FB950" font-size="8" font-family="monospace" text-anchor="middle">V: 4–8 VDC</text>
+    <rect x="14" y="48" width="62" height="14" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="1"/>
+    <text x="45" y="59" fill="#3FB950" font-size="8" font-family="monospace" text-anchor="middle">A: 100–500 A</text>
+    <line x1="80" y1="40" x2="108" y2="40" stroke="#388BFD" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="80" y1="60" x2="108" y2="60" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <rect x="108" y="15" width="100" height="80" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="158" y="12" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">Ni BATH TANK</text>
+    <rect x="116" y="22" width="84" height="66" rx="2" fill="#0A1F1A" opacity="0.8"/>
+    <line x1="135" y1="22" x2="135" y2="88" stroke="#388BFD" stroke-width="1.5"/>
+    <line x1="181" y1="22" x2="181" y2="88" stroke="#F85149" stroke-width="1.5"/>
+  </svg>`,
+
+  "LHE Cadmium": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="20" width="70" height="70" rx="4" fill="none" stroke="#D29922" stroke-width="1.5"/>
+    <text x="45" y="10" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="14" y="28" width="62" height="14" rx="2" fill="#2B1D07" stroke="#D29922" stroke-width="1"/>
+    <text x="45" y="39" fill="#D29922" font-size="8" font-family="monospace" text-anchor="middle">V: 6–12 VDC</text>
+    <rect x="14" y="48" width="62" height="14" rx="2" fill="#2B1D07" stroke="#D29922" stroke-width="1"/>
+    <text x="45" y="59" fill="#D29922" font-size="8" font-family="monospace" text-anchor="middle">A: 50–300 A</text>
+    <line x1="80" y1="40" x2="108" y2="40" stroke="#D29922" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <rect x="108" y="15" width="100" height="80" rx="4" fill="none" stroke="#D29922" stroke-width="1.5"/>
+    <text x="158" y="12" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">Cd BATH TANK</text>
+    <rect x="116" y="22" width="84" height="66" rx="2" fill="#1A1200" opacity="0.8"/>
+    <text x="158" y="80" fill="#6E7681" font-size="7" text-anchor="middle">⚠ HAZARDOUS</text>
+  </svg>`,
+
+  "Hard Chrome": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="18" width="75" height="76" rx="4" fill="none" stroke="#388BFD" stroke-width="2"/>
+    <text x="47" y="10" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="14" y="24" width="67" height="12" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="0.8"/>
+    <text x="47" y="34" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">V: 8–12 VDC</text>
+    <rect x="14" y="40" width="67" height="12" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="0.8"/>
+    <text x="47" y="50" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">A: 500–3000 A</text>
+    <line x1="85" y1="38" x2="108" y2="38" stroke="#388BFD" stroke-width="2" stroke-dasharray="3,2"/>
+    <rect x="108" y="12" width="105" height="84" rx="4" fill="none" stroke="#388BFD" stroke-width="1.5"/>
+    <text x="160" y="9" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">Cr BATH TANK</text>
+    <rect x="115" y="19" width="91" height="70" rx="2" fill="#060C1A" opacity="0.9"/>
+  </svg>`,
+
+  "Chromic Acid Anodizing": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="18" width="72" height="72" rx="4" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <text x="44" y="10" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="12" y="24" width="64" height="12" rx="2" fill="#1A1040" stroke="#7F77DD" stroke-width="0.8"/>
+    <text x="44" y="34" fill="#AFA9EC" font-size="7" font-family="monospace" text-anchor="middle">V: 0–40 VDC RAMP</text>
+    <polyline points="14,70 28,70 28,58 42,58 42,70 56,70 56,58 70,58" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <rect x="108" y="12" width="108" height="84" rx="4" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <text x="162" y="9" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">ANODIZE TANK</text>
+    <rect x="115" y="19" width="94" height="70" rx="2" fill="#0D0820" opacity="0.9"/>
+  </svg>`,
+
+  "Stripping Hard Chrome": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="18" width="72" height="72" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="44" y="10" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="12" y="56" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
+    <text x="44" y="66" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">REVERSE POLARITY</text>
+    <circle cx="30" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <circle cx="44" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <rect x="108" y="12" width="108" height="84" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="162" y="9" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">STRIP TANK</text>
+    <rect x="115" y="19" width="94" height="70" rx="2" fill="#03120C" opacity="0.9"/>
+  </svg>`
+};
+
+// ========== API FUNCTIONS ==========
 async function fetchData() {
   showLoading(true);
   try {
@@ -409,110 +318,54 @@ async function fetchData() {
     renderCards();
     renderLogbook();
   } catch (e) {
-    console.error("Gagal mengambil data:", e);
-    alert("Koneksi gagal. Pastikan Web App GAS sudah di-deploy sebagai 'Anyone'.");
+    console.error("Fetch Error:", e);
   } finally {
     showLoading(false);
   }
 }
 
-// ========== SIMPAN UPDATE RECTIFIER ==========
 async function saveEdit() {
   const i = parseInt(document.getElementById('editIndex').value);
-  const originalData = rectData[i];
-  
+  const original = rectData[i];
   const payload = {
     action: "updateRect",
     data: {
-      sheetRow: originalData.sheetRow,
+      sheetRow: original.sheetRow,
       status: document.getElementById('editStatus').value === "service" ? "In Service" : "Unservice",
       voltMin: parseFloat(document.getElementById('editVoltMin').value),
       voltMax: parseFloat(document.getElementById('editVoltMax').value),
-      currMin: parseFloat(document.getElementById('editCurrMin').value),
-      currMax: parseFloat(document.getElementById('editCurrMax').value),
       calibNo: document.getElementById('editCalibNo').value,
-      calibDate: document.getElementById('editCalibDate').value,
       dueDate: document.getElementById('editDueDate').value
     }
   };
-
   showLoading(true);
-  try {
-    await fetch(GAS_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    closeEditModal();
-    await fetchData(); // Refresh data
-    showSaveIndicator();
-  } catch (e) {
-    alert("Gagal menyimpan data.");
-  } finally {
-    showLoading(false);
-  }
+  await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+  closeEditModal();
+  fetchData();
 }
 
-// ========== SIMPAN LOG BARU ==========
 async function saveLog() {
   const sel = document.getElementById('logUnit');
-  const opt = sel.options[sel.selectedIndex];
-  
   const payload = {
     action: "addLog",
     data: {
       unitId: sel.value,
-      unitName: opt.text,
-      date: document.getElementById('logDate').value,
+      unitName: sel.options[sel.selectedIndex].text,
+      date: new Date().toISOString().split('T')[0],
       severity: document.getElementById('logSeverity').value.charAt(0).toUpperCase() + document.getElementById('logSeverity').value.slice(1),
       damage: document.getElementById('logDamage').value,
       reporter: document.getElementById('logReporter').value,
       action: document.getElementById('logAction').value,
-      status: document.getElementById('logStatus').value.charAt(0).toUpperCase() + document.getElementById('logStatus').value.slice(1)
+      status: document.getElementById('logSeverity').value === 'resolved' ? 'Resolved' : (document.getElementById('logSeverity').value === 'critical' ? 'Critical' : 'Minor')
     }
   };
-
   showLoading(true);
-  try {
-    await fetch(GAS_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    closeLogModal();
-    await fetchData();
-    showSaveIndicator();
-  } catch (e) {
-    alert("Gagal menambah log.");
-  } finally {
-    showLoading(false);
-  }
+  await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+  closeLogModal();
+  fetchData();
 }
 
-// ========== UTILS & RENDER (Tetap sama dengan sedikit penyesuaian) ==========
-
-function showLoading(status) {
-  document.getElementById('saveIndicator').textContent = status ? "⌛ Loading..." : "✔ Data Synced";
-  document.getElementById('saveIndicator').style.opacity = "1";
-}
-
-function showSaveIndicator() {
-  const el = document.getElementById('saveIndicator');
-  el.textContent = "✔ Saved to Google Sheet";
-  setTimeout(() => el.style.opacity = "0", 3000);
-}
-
-function daysUntil(dateStr) {
-  if(!dateStr) return 0;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const d = new Date(dateStr);
-  return Math.round((d - today) / 86400000);
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'});
-}
-
+// ========== RENDER FUNCTIONS ==========
 function renderCards() {
   const grid = document.getElementById('rectGrid');
   grid.innerHTML = '';
@@ -523,13 +376,7 @@ function renderCards() {
     const days = daysUntil(r.dueDate);
     if (days < 0) overdue++;
 
-    let dueDateClass = 'ok';
-    let dueDateText = `${formatDate(r.dueDate)}`;
-    if (days < 0) { dueDateClass = 'danger'; dueDateText += ' ⚠ OVERDUE'; }
-    else if (days <= 30) { dueDateClass = 'warn'; dueDateText += ` (${days}d)`; }
-    else { dueDateText += ` (${days}d)`; }
-
-    const voltPct = Math.min(100, Math.round((r.voltMax / 50) * 100));
+    const dueDateClass = days < 0 ? 'danger' : (days <= 30 ? 'warn' : 'ok');
 
     const card = document.createElement('div');
     card.className = `rect-card ${r.status}`;
@@ -538,22 +385,21 @@ function renderCards() {
         <div><div class="card-id">${r.id}</div><div class="card-name">${r.name}</div></div>
         <div class="status-badge ${r.status}"><div class="status-dot"></div>${r.status === 'service' ? 'IN SERVICE' : 'UNSERVICE'}</div>
       </div>
-      <div class="sketch-area">${getSketch(r.name)}</div>
+      <div class="sketch-area">${sketches[r.name] || '<p style="color:var(--text3); font-size:10px; margin-top:60px;">NO SKETCH AVAILABLE</p>'}</div>
       <div class="card-body">
         <div class="info-grid">
           <div class="info-item"><div class="info-label">Voltage Range</div><div class="info-value highlight">${r.voltMin}–${r.voltMax} VDC</div></div>
           <div class="info-item"><div class="info-label">Current Range</div><div class="info-value highlight">${r.currMin}–${r.currMax} A</div></div>
-          <div class="info-item"><div class="info-label">Calib. Reg. No.</div><div class="info-value">${r.calibNo}</div></div>
-          <div class="info-item" style="grid-column:span 2"><div class="info-label">Due Date Calibration</div><div class="info-value ${dueDateClass}">${dueDateText}</div></div>
+          <div class="info-item" style="grid-column:span 2"><div class="info-label">Due Date Calibration</div><div class="info-value ${dueDateClass}">${formatDate(r.dueDate)} (${days}d)</div></div>
         </div>
         <div class="damage-box ${r.damage === 'None' ? 'none' : ''}">
           <div class="dmg-label">⚠ Damage Detail</div>
-          <div class="dmg-text">${r.damage || 'No damage reported'}</div>
+          <div class="dmg-text">${r.damage}</div>
         </div>
       </div>
       <div class="card-footer">
-        <button class="btn primary" onclick="openEdit(${i})">✎ Edit Data</button>
-        <button class="btn danger" onclick="openAddLogForUnit('${r.id}','${r.name}')">+ Log Kerusakan</button>
+        <button class="btn primary" onclick="openEdit(${i})">✎ Edit</button>
+        <button class="btn danger" onclick="openAddLogForUnit('${r.id}')">+ Log</button>
       </div>
     `;
     grid.appendChild(card);
@@ -568,49 +414,58 @@ function renderCards() {
 function renderLogbook() {
   const tbody = document.getElementById('logbookBody');
   const filterUnit = document.getElementById('filterUnit').value;
-  const filterSev = document.getElementById('filterSeverity').value;
 
-  // Filter data berdasarkan dropdown (jika ada)
   let filtered = logData.filter(l => {
-    // Pastikan l.unitId ada (tidak null/undefined)
-    if (!l.unitId) return false;
-    
-    const matchUnit = filterUnit ? l.unitId === filterUnit : true;
-    const matchSev = filterSev ? l.severity === filterSev : true;
-    return matchUnit && matchSev;
+    if (!l.unitId) return false; // Buang baris kosong
+    return filterUnit ? l.unitId === filterUnit : true;
   });
 
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:#8B949E; font-style:italic;">No valid log entries found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text3);">No valid log entries.</td></tr>';
     return;
   }
 
   tbody.innerHTML = filtered.map(l => `
     <tr>
-      <td style="font-family:monospace; font-size:11px; color:#8B949E;">${formatDate(l.date)}</td>
-      <td><strong>${l.unit || '-'}</strong> <br><small style="color:#6E7681">${l.unitId || ''}</small></td>
-      <td><span class="tag tag-${l.severity}">${l.severity || 'info'}</span></td>
-      <td style="max-width:250px; line-height:1.4;">${l.damage || '-'}</td>
-      <td style="color:#8B949E;">${l.reporter || '-'}</td>
-      <td style="max-width:150px; font-size:11px; color:#8B949E;">${l.action || '-'}</td>
-      <td><span class="tag tag-${l.status}">${l.status || 'open'}</span></td>
-      <td>
-        <div class="log-action-btns">
-          <button class="icon-btn" title="View Detail" onclick="viewLogDetail('${l.unit}', \`${l.damage}\`)">👁</button>
-        </div>
-      </td>
+      <td style="font-family:monospace; font-size:11px;">${formatDate(l.date)}</td>
+      <td><strong>${l.unit}</strong><br><small style="color:var(--text3)">${l.unitId}</small></td>
+      <td><span class="tag tag-${l.severity}">${l.severity}</span></td>
+      <td style="max-width:250px;">${l.damage}</td>
+      <td>${l.reporter}</td>
+      <td style="font-size:11px; color:var(--text2);">${l.action || '-'}</td>
+      <td><span class="tag tag-${l.status.toLowerCase()}">${l.status}</span></td>
+      <td><button class="icon-btn" onclick="alert('${l.damage}')" style="cursor:pointer; background:none; border:none; color:var(--blue);">👁</button></td>
     </tr>
   `).join('');
 }
 
-// Tambahkan fungsi helper sederhana jika belum ada untuk Modal Detail
-function viewLogDetail(unit, damage) {
-  alert("Unit: " + unit + "\n\nDamage Detail:\n" + damage);
+// ========== HELPERS ==========
+function showLoading(status) {
+  const el = document.getElementById('saveIndicator');
+  el.textContent = status ? "⌛ Syncing..." : "✔ Data Synced";
+  el.style.opacity = "1";
+  if(!status) setTimeout(() => el.style.opacity = "0", 3000);
+}
+
+function daysUntil(dateStr) {
+  if(!dateStr) return 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr);
+  return Math.round((d - today) / 86400000);
+}
+
+function formatDate(dateStr) {
+  if(!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
 }
 
 function populateUnitFilter() {
-  const sel = document.getElementById('logUnit');
-  sel.innerHTML = rectData.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  const selFilter = document.getElementById('filterUnit');
+  const selModal = document.getElementById('logUnit');
+  const options = rectData.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  selFilter.innerHTML = '<option value="">All Units</option>' + options;
+  selModal.innerHTML = options;
 }
 
 function openEdit(i) {
@@ -619,10 +474,7 @@ function openEdit(i) {
   document.getElementById('editStatus').value = r.status;
   document.getElementById('editVoltMin').value = r.voltMin;
   document.getElementById('editVoltMax').value = r.voltMax;
-  document.getElementById('editCurrMin').value = r.currMin;
-  document.getElementById('editCurrMax').value = r.currMax;
   document.getElementById('editCalibNo').value = r.calibNo;
-  document.getElementById('editCalibDate').value = r.calibDate ? new Date(r.calibDate).toISOString().split('T')[0] : "";
   document.getElementById('editDueDate').value = r.dueDate ? new Date(r.dueDate).toISOString().split('T')[0] : "";
   document.getElementById('editModal').classList.add('open');
 }
@@ -630,33 +482,15 @@ function openEdit(i) {
 function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
 function openAddLog() { document.getElementById('logModal').classList.add('open'); }
 function closeLogModal() { document.getElementById('logModal').classList.remove('open'); }
+function openAddLogForUnit(id) { openAddLog(); document.getElementById('logUnit').value = id; }
 
-function openAddLogForUnit(id, name) {
-  openAddLog();
-  document.getElementById('logUnit').value = id;
-}
-
-// Helper untuk mengambil sketch SVG berdasarkan nama
-function getSketch(name) {
-  const sketches = {
-    "Nickel Strike": `...`, // SVG code Anda sebelumnya
-    "LHE Cadmium": `...`,
-    "Hard Chrome": `...`,
-    "Chromic Acid Anodizing": `...`,
-    "Stripping Hard Chrome": `...`
-  };
-  return sketches[name] || "";
-}
-
-// Clock & Init
+// Clock
 setInterval(() => {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('id-ID');
 }, 1000);
 
-// RUN INIT
+// Init
 fetchData();
-
 </script>
 </body>
 </html>
