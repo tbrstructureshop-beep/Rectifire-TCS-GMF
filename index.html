@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rectifier Monitoring Dashboard — Electroplating Facility</title>
+<style>
+  :root {
+    --bg: #0D1117;
+    --surface: #161B22;
+    --surface2: #1C2128;
+    --border: #30363D;
+    --border2: #21262D;
+    --text: #E6EDF3;
+    --text2: #8B949E;
+    --text3: #6E7681;
+    --green: #3FB950;
+    --green-bg: #0F2B1A;
+    --green-border: #1A4A2A;
+    --red: #F85149;
+    --red-bg: #2B0F0E;
+    --red-border: #4A1A19;
+    --amber: #D29922;
+    --amber-bg: #2B1D07;
+    --blue: #388BFD;
+    --blue-bg: #0D2444;
+    --accent: #1F6FEB;
+    --mono: 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* HEADER */
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-logo { width: 40px; height: 40px; }
+  .header-title h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+  .header-title p { font-size: 11px; color: var(--text2); margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--green); font-family: var(--mono); text-transform: uppercase; letter-spacing: 1px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse-green 2s infinite; }
+  @keyframes pulse-green { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+  .clock { font-family: var(--mono); font-size: 13px; color: var(--text2); }
+
+  /* SUMMARY BAR */
+  .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border2); border-bottom: 1px solid var(--border); }
+  .summary-item { background: var(--surface); padding: 14px 24px; }
+  .summary-item .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 5px; }
+  .summary-item .value { font-size: 22px; font-weight: 700; font-family: var(--mono); }
+  .summary-item .value.green { color: var(--green); }
+  .summary-item .value.red { color: var(--red); }
+  .summary-item .value.amber { color: var(--amber); }
+  .summary-item .value.blue { color: var(--blue); }
+
+  /* MAIN */
+  .main { padding: 24px 28px; }
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+
+  /* RECTIFIER GRID */
+  .rect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 32px; }
+
+  /* RECTIFIER CARD */
+  .rect-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color 0.2s; }
+  .rect-card:hover { border-color: var(--blue); }
+  .rect-card.service { border-top: 3px solid var(--green); }
+  .rect-card.unservice { border-top: 3px solid var(--red); }
+
+  .card-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--border2); }
+  .card-id { font-size: 10px; font-family: var(--mono); color: var(--text3); margin-bottom: 3px; letter-spacing: 0.5px; }
+  .card-name { font-size: 15px; font-weight: 600; }
+  .status-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 10px; border-radius: 20px; }
+  .status-badge.service { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+  .status-badge.unservice { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .status-badge.service .status-dot { background: var(--green); animation: pulse-green 2s infinite; }
+  .status-badge.unservice .status-dot { background: var(--red); animation: pulse-red 2s infinite; }
+  @keyframes pulse-red { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+  /* SVG SKETCH AREA */
+  .sketch-area { padding: 12px 16px; background: #0A0E13; border-bottom: 1px solid var(--border2); display: flex; justify-content: center; }
+  .sketch-area svg { display: block; }
+
+  /* CARD BODY */
+  .card-body { padding: 12px 16px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .info-item .info-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 3px; }
+  .info-item .info-value { font-size: 12px; font-family: var(--mono); color: var(--text); }
+  .info-item .info-value.highlight { color: var(--blue); }
+  .info-item .info-value.warn { color: var(--amber); }
+  .info-item .info-value.ok { color: var(--green); }
+  .info-item .info-value.danger { color: var(--red); }
+
+  .voltage-bar { margin: 10px 0; }
+  .voltage-bar .vb-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+  .voltage-bar .vb-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .voltage-bar .vb-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #1a6b3a, var(--green)); }
+
+  .damage-box { background: #16100A; border: 1px solid #3D2B10; border-radius: 6px; padding: 8px 10px; margin-top: 8px; }
+  .damage-box .dmg-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #7A5020; margin-bottom: 4px; }
+  .damage-box .dmg-text { font-size: 12px; color: var(--amber); line-height: 1.5; }
+  .damage-box.none { background: var(--surface2); border-color: var(--border2); }
+  .damage-box.none .dmg-label { color: var(--text3); }
+  .damage-box.none .dmg-text { color: var(--text2); font-style: italic; }
+
+  .card-footer { padding: 10px 16px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
+  .btn { cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 5px; padding: 5px 12px; font-size: 11px; font-family: inherit; transition: all 0.15s; }
+  .btn:hover { background: var(--border); }
+  .btn.primary { background: var(--blue-bg); border-color: #1A3A6B; color: var(--blue); }
+  .btn.primary:hover { background: #0F1D33; }
+  .btn.danger { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+
+  /* EDIT MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h3 { font-size: 15px; font-weight: 600; }
+  .modal-close { cursor: pointer; background: none; border: none; color: var(--text2); font-size: 20px; line-height: 1; padding: 0 4px; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 20px; }
+  .form-row { margin-bottom: 14px; }
+  .form-row label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 5px; }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 10px;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--blue); }
+  .form-row textarea { resize: vertical; min-height: 60px; }
+  .form-row select option { background: var(--surface); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border2); display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* LOGBOOK */
+  .logbook-container { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .logbook-header { padding: 14px 20px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
+  .logbook-header h2 { font-size: 14px; font-weight: 600; }
+  .logbook-filters { display: flex; gap: 8px; }
+  .logbook-filters select, .logbook-filters input { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-family: inherit; font-size: 12px; padding: 5px 8px; }
+  .log-table { width: 100%; border-collapse: collapse; }
+  .log-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border2); background: #111519; }
+  .log-table td { padding: 10px 16px; border-bottom: 1px solid var(--border2); font-size: 12px; vertical-align: top; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: var(--surface2); }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tag-critical { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); }
+  .tag-minor { color: var(--amber); background: var(--amber-bg); border: 1px solid #3D2B10; }
+  .tag-resolved { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+  .log-action-btns { display: flex; gap: 6px; }
+  .icon-btn { cursor: pointer; background: none; border: none; color: var(--text3); font-size: 16px; padding: 2px; transition: color 0.15s; }
+  .icon-btn:hover { color: var(--text); }
+  .empty-row td { text-align: center; color: var(--text3); font-style: italic; padding: 32px; }
+
+  /* ADD LOG MODAL */
+  .add-log-btn { cursor: pointer; background: var(--blue-bg); border: 1px solid #1A3A6B; color: var(--blue); border-radius: 6px; padding: 7px 14px; font-size: 12px; font-family: inherit; transition: all 0.15s; }
+  .add-log-btn:hover { background: #0F1D33; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 20px; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border2); margin-top: 32px; }
+
+  /* Overdue highlight */
+  .overdue { color: var(--red) !important; }
+  .due-soon { color: var(--amber) !important; }
+
+  @media (max-width: 768px) {
+    .rect-grid { grid-template-columns: 1fr; }
+    .summary-bar { grid-template-columns: repeat(2,1fr); }
+    .main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <svg class="header-logo" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="8" fill="#1F6FEB" opacity="0.15"/>
+      <rect x="6" y="14" width="28" height="16" rx="3" fill="none" stroke="#388BFD" stroke-width="1.5"/>
+      <line x1="10" y1="14" x2="10" y2="10" stroke="#388BFD" stroke-width="1.5"/>
+      <line x1="30" y1="14" x2="30" y2="10" stroke="#388BFD" stroke-width="1.5"/>
+      <line x1="8" y1="10" x2="32" y2="10" stroke="#3FB950" stroke-width="1.5"/>
+      <rect x="9" y="17" width="8" height="10" rx="1" fill="#388BFD" opacity="0.4"/>
+      <rect x="23" y="17" width="8" height="10" rx="1" fill="#388BFD" opacity="0.4"/>
+      <line x1="17" y1="22" x2="23" y2="22" stroke="#3FB950" stroke-width="1.5"/>
+      <circle cx="20" cy="22" r="2" fill="#3FB950"/>
+    </svg>
+    <div class="header-title">
+      <h1>RECTIFIER MONITORING DASHBOARD</h1>
+      <p>Electroplating Facility · Specialized Process Division</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="saveIndicator" style="font-size:11px;color:#3FB950;font-family:monospace;opacity:0;transition:opacity 0.4s;letter-spacing:0.5px;">✔ Saved</div>
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<!-- SUMMARY BAR -->
+<div class="summary-bar" id="summaryBar">
+  <div class="summary-item"><div class="label">Total Rectifier</div><div class="value blue" id="sumTotal">5</div></div>
+  <div class="summary-item"><div class="label">In Service</div><div class="value green" id="sumService">-</div></div>
+  <div class="summary-item"><div class="label">Unservice</div><div class="value red" id="sumUnservice">-</div></div>
+  <div class="summary-item"><div class="label">Overdue Calibration</div><div class="value amber" id="sumOverdue">-</div></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="section-title">Rectifier Units Overview</div>
+  <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:14px;">
+    <button class="btn primary" onclick="exportRectifierCSV()">⬇ Export Rectifier Data (CSV)</button>
+    <button class="btn primary" onclick="exportLogbookCSV()">⬇ Export Logbook (CSV)</button>
+  </div>
+
+  <!-- RECTIFIER CARDS -->
+  <div class="rect-grid" id="rectGrid"></div>
+
+  <!-- LOGBOOK -->
+  <div class="section-title">Damage & Maintenance Logbook</div>
+  <div class="logbook-container">
+    <div class="logbook-header">
+      <h2>📋 Logbook Record</h2>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="logbook-filters">
+          <select id="filterUnit" onchange="renderLogbook()">
+            <option value="">All Units</option>
+          </select>
+          <select id="filterSeverity" onchange="renderLogbook()">
+            <option value="">All Severity</option>
+            <option value="critical">Critical</option>
+            <option value="minor">Minor</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <button class="add-log-btn" onclick="openAddLog()">+ Add Log Entry</button>
+        <button class="add-log-btn" onclick="exportLogbookCSV()">⬇ Export CSV</button>
+      </div>
+    </div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th style="width:100px">Date/Time</th>
+          <th style="width:130px">Rectifier Unit</th>
+          <th style="width:90px">Severity</th>
+          <th>Damage Detail</th>
+          <th style="width:110px">Reported By</th>
+          <th style="width:110px">Action Taken</th>
+          <th style="width:80px">Status</th>
+          <th style="width:70px">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="logbookBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- EDIT RECTIFIER MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="editModalTitle">Edit Rectifier Data</h3>
+      <button class="modal-close" onclick="closeEditModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editIndex"/>
+      <div class="form-row">
+        <label>Status</label>
+        <select id="editStatus">
+          <option value="service">In Service</option>
+          <option value="unservice">Unservice</option>
+        </select>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Voltage Min (V)</label>
+          <input type="number" id="editVoltMin"/>
+        </div>
+        <div class="form-row">
+          <label>Voltage Max (V)</label>
+          <input type="number" id="editVoltMax"/>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Current Min (A)</label>
+          <input type="number" id="editCurrMin"/>
+        </div>
+        <div class="form-row">
+          <label>Current Max (A)</label>
+          <input type="number" id="editCurrMax"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Calibration Reg. No.</label>
+        <input type="text" id="editCalibNo"/>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Calibration Date</label>
+          <input type="date" id="editCalibDate"/>
+        </div>
+        <div class="form-row">
+          <label>Due Date Calibration</label>
+          <input type="date" id="editDueDate"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Damage Detail</label>
+        <textarea id="editDamage" rows="3" placeholder="Describe damage or write 'None' if no damage..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeEditModal()">Cancel</button>
+      <button class="btn primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LOG MODAL -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Logbook Entry</h3>
+      <button class="modal-close" onclick="closeLogModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="logEditId"/>
+      <div class="form-row">
+        <label>Rectifier Unit</label>
+        <select id="logUnit"></select>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Date</label>
+          <input type="date" id="logDate"/>
+        </div>
+        <div class="form-row">
+          <label>Severity</label>
+          <select id="logSeverity">
+            <option value="critical">Critical</option>
+            <option value="minor">Minor</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Damage Detail</label>
+        <textarea id="logDamage" rows="3" placeholder="Describe the damage or issue..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>Reported By</label>
+        <input type="text" id="logReporter" placeholder="Name / Employee ID"/>
+      </div>
+      <div class="form-row">
+        <label>Action Taken</label>
+        <textarea id="logAction" rows="2" placeholder="Action taken or pending..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>Status</label>
+        <select id="logStatus">
+          <option value="minor">Open</option>
+          <option value="critical">Critical – Need Immediate Action</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeLogModal()">Cancel</button>
+      <button class="btn primary" onclick="saveLog()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW LOG MODAL -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Log Entry Detail</h3>
+      <button class="modal-close" onclick="document.getElementById('viewModal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body" id="viewModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('viewModal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Rectifier Monitoring System v1.0 · Electroplating Facility · Data updates in real-time</div>
+
+<script>
+// ========== SVG SKETCHES ==========
+const sketches = {
+  "Nickel Strike": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="20" width="70" height="70" rx="4" fill="none" stroke="#388BFD" stroke-width="1.5"/>
+    <text x="45" y="10" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="14" y="28" width="62" height="14" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="1"/>
+    <text x="45" y="39" fill="#3FB950" font-size="8" font-family="monospace" text-anchor="middle">V: 4–8 VDC</text>
+    <rect x="14" y="48" width="62" height="14" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="1"/>
+    <text x="45" y="59" fill="#3FB950" font-size="8" font-family="monospace" text-anchor="middle">A: 100–500 A</text>
+    <rect x="24" y="68" width="14" height="10" rx="2" fill="#1F6FEB" opacity="0.5"/>
+    <rect x="44" y="68" width="14" height="10" rx="2" fill="#1F6FEB" opacity="0.5"/>
+    <circle cx="31" cy="73" r="2" fill="#3FB950"/>
+    <circle cx="51" cy="73" r="2" fill="#F85149"/>
+    <line x1="80" y1="40" x2="108" y2="40" stroke="#388BFD" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="80" y1="60" x2="108" y2="60" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <text x="84" y="36" fill="#388BFD" font-size="8" font-family="monospace">+DC</text>
+    <text x="84" y="56" fill="#F85149" font-size="8" font-family="monospace">−DC</text>
+    <rect x="108" y="15" width="100" height="80" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="158" y="12" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">Ni BATH TANK</text>
+    <rect x="116" y="22" width="84" height="66" rx="2" fill="#0A1F1A" opacity="0.8"/>
+    <line x1="135" y1="22" x2="135" y2="88" stroke="#388BFD" stroke-width="1.5"/>
+    <line x1="181" y1="22" x2="181" y2="88" stroke="#F85149" stroke-width="1.5"/>
+    <text x="135" y="100" fill="#388BFD" font-size="8" text-anchor="middle">ANODE</text>
+    <text x="181" y="100" fill="#F85149" font-size="8" text-anchor="middle">CATHODE</text>
+    <text x="158" y="62" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">NiSO4 / NiCl2</text>
+    <text x="158" y="74" fill="#8B949E" font-size="8" font-family="monospace" text-anchor="middle">pH 3.8–4.5</text>
+  </svg>`,
+
+  "LHE Cadmium": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="20" width="70" height="70" rx="4" fill="none" stroke="#D29922" stroke-width="1.5"/>
+    <text x="45" y="10" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="14" y="28" width="62" height="14" rx="2" fill="#2B1D07" stroke="#D29922" stroke-width="1"/>
+    <text x="45" y="39" fill="#D29922" font-size="8" font-family="monospace" text-anchor="middle">V: 6–12 VDC</text>
+    <rect x="14" y="48" width="62" height="14" rx="2" fill="#2B1D07" stroke="#D29922" stroke-width="1"/>
+    <text x="45" y="59" fill="#D29922" font-size="8" font-family="monospace" text-anchor="middle">A: 50–300 A</text>
+    <text x="45" y="78" fill="#8B949E" font-size="7" font-family="monospace" text-anchor="middle">LOW-H EMBRITTLEMENT</text>
+    <line x1="80" y1="40" x2="108" y2="40" stroke="#D29922" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="80" y1="60" x2="108" y2="60" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <rect x="108" y="15" width="100" height="80" rx="4" fill="none" stroke="#D29922" stroke-width="1.5"/>
+    <text x="158" y="12" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">Cd BATH TANK</text>
+    <rect x="116" y="22" width="84" height="66" rx="2" fill="#1A1200" opacity="0.8"/>
+    <line x1="135" y1="22" x2="135" y2="88" stroke="#D29922" stroke-width="1.5"/>
+    <line x1="181" y1="22" x2="181" y2="88" stroke="#F85149" stroke-width="1.5"/>
+    <text x="135" y="100" fill="#D29922" font-size="8" text-anchor="middle">ANODE</text>
+    <text x="181" y="100" fill="#F85149" font-size="8" text-anchor="middle">CATHODE</text>
+    <text x="158" y="58" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">CdO + NH4OH</text>
+    <text x="158" y="70" fill="#8B949E" font-size="8" font-family="monospace" text-anchor="middle">Alkaline Bath</text>
+    <rect x="116" y="82" width="84" height="4" rx="1" fill="#2B1D07"/>
+    <text x="158" y="80" fill="#6E7681" font-size="7" text-anchor="middle">⚠ HAZARDOUS</text>
+  </svg>`,
+
+  "Hard Chrome": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="18" width="75" height="76" rx="4" fill="none" stroke="#388BFD" stroke-width="2"/>
+    <text x="47" y="10" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="14" y="24" width="67" height="12" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="0.8"/>
+    <text x="47" y="34" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">V: 8–12 VDC</text>
+    <rect x="14" y="40" width="67" height="12" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="0.8"/>
+    <text x="47" y="50" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">A: 500–3000 A</text>
+    <rect x="14" y="56" width="67" height="12" rx="2" fill="#0D2444" stroke="#388BFD" stroke-width="0.8"/>
+    <text x="47" y="66" fill="#388BFD" font-size="7" font-family="monospace" text-anchor="middle">HIGH CURRENT</text>
+    <rect x="22" y="74" width="10" height="14" rx="2" fill="#388BFD" opacity="0.6"/>
+    <rect x="38" y="74" width="10" height="14" rx="2" fill="#388BFD" opacity="0.6"/>
+    <rect x="54" y="74" width="10" height="14" rx="2" fill="#388BFD" opacity="0.6"/>
+    <line x1="85" y1="38" x2="108" y2="38" stroke="#388BFD" stroke-width="2" stroke-dasharray="3,2"/>
+    <line x1="85" y1="58" x2="108" y2="58" stroke="#F85149" stroke-width="2" stroke-dasharray="3,2"/>
+    <rect x="108" y="12" width="105" height="84" rx="4" fill="none" stroke="#388BFD" stroke-width="1.5"/>
+    <text x="160" y="9" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">Cr BATH TANK</text>
+    <rect x="115" y="19" width="91" height="70" rx="2" fill="#060C1A" opacity="0.9"/>
+    <line x1="133" y1="19" x2="133" y2="89" stroke="#388BFD" stroke-width="2"/>
+    <rect x="129" y="14" width="8" height="7" rx="1" fill="#388BFD"/>
+    <line x1="185" y1="19" x2="185" y2="89" stroke="#F85149" stroke-width="2"/>
+    <rect x="181" y="14" width="8" height="7" rx="1" fill="#F85149"/>
+    <text x="133" y="101" fill="#388BFD" font-size="8" text-anchor="middle">Pb ANODE</text>
+    <text x="185" y="101" fill="#F85149" font-size="8" text-anchor="middle">CATHODE</text>
+    <text x="160" y="56" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">CrO3 + H2SO4</text>
+    <text x="160" y="68" fill="#6E7681" font-size="8" font-family="monospace" text-anchor="middle">250 g/L + 2.5 g/L</text>
+  </svg>`,
+
+  "Chromic Acid Anodizing": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="18" width="72" height="72" rx="4" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <text x="44" y="10" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="12" y="24" width="64" height="12" rx="2" fill="#1A1040" stroke="#7F77DD" stroke-width="0.8"/>
+    <text x="44" y="34" fill="#AFA9EC" font-size="7" font-family="monospace" text-anchor="middle">V: 0–40 VDC RAMP</text>
+    <rect x="12" y="40" width="64" height="12" rx="2" fill="#1A1040" stroke="#7F77DD" stroke-width="0.8"/>
+    <text x="44" y="50" fill="#AFA9EC" font-size="7" font-family="monospace" text-anchor="middle">A: 10–200 A</text>
+    <polyline points="14,70 28,70 28,58 42,58 42,70 56,70 56,58 70,58" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <text x="44" y="82" fill="#6E7681" font-size="7" font-family="monospace" text-anchor="middle">RAMP PROFILE</text>
+    <line x1="80" y1="38" x2="108" y2="38" stroke="#9F7BE1" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="80" y1="58" x2="108" y2="58" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <rect x="108" y="12" width="108" height="84" rx="4" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <text x="162" y="9" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">ANODIZE TANK</text>
+    <rect x="115" y="19" width="94" height="70" rx="2" fill="#0D0820" opacity="0.9"/>
+    <rect x="124" y="24" width="12" height="60" rx="3" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
+    <rect x="126" y="24" width="8" height="60" rx="2" fill="#1A1040"/>
+    <text x="130" y="96" fill="#9F7BE1" font-size="7" text-anchor="middle">CATHODE</text>
+    <rect x="180" y="30" width="14" height="48" rx="3" fill="none" stroke="#F85149" stroke-width="1.5"/>
+    <rect x="182" y="32" width="10" height="44" rx="2" fill="#200808"/>
+    <text x="187" y="96" fill="#F85149" font-size="7" text-anchor="middle">PART</text>
+    <text x="162" y="56" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">10% CrO3</text>
+    <text x="162" y="68" fill="#6E7681" font-size="8" font-family="monospace" text-anchor="middle">35°C ± 2°C</text>
+    <text x="130" y="14" fill="#9F7BE1" font-size="7" font-family="monospace">+</text>
+    <text x="185" y="14" fill="#F85149" font-size="7" font-family="monospace">PART</text>
+  </svg>`,
+
+  "Stripping Hard Chrome": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="18" width="72" height="72" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="44" y="10" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
+    <rect x="12" y="24" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
+    <text x="44" y="34" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">V: 6–18 VDC</text>
+    <rect x="12" y="40" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
+    <text x="44" y="50" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">A: 20–150 A</text>
+    <rect x="12" y="56" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
+    <text x="44" y="66" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">REVERSE POLARITY</text>
+    <circle cx="30" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <circle cx="44" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <circle cx="58" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <line x1="36" y1="82" x2="38" y2="82" stroke="#8B949E" stroke-width="1"/>
+    <line x1="50" y1="82" x2="52" y2="82" stroke="#8B949E" stroke-width="1"/>
+    <line x1="80" y1="38" x2="108" y2="38" stroke="#5DCAA5" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="80" y1="58" x2="108" y2="58" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <rect x="108" y="12" width="108" height="84" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="162" y="9" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">STRIP TANK</text>
+    <rect x="115" y="19" width="94" height="70" rx="2" fill="#03120C" opacity="0.9"/>
+    <rect x="130" y="28" width="64" height="50" rx="3" fill="none" stroke="#5DCAA5" stroke-width="1"/>
+    <rect x="146" y="34" width="32" height="38" rx="2" fill="#0A1F1A"/>
+    <line x1="162" y1="19" x2="162" y2="28" stroke="#5DCAA5" stroke-width="2"/>
+    <text x="162" y="52" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">NaOH / H3PO4</text>
+    <text x="162" y="64" fill="#6E7681" font-size="8" font-family="monospace" text-anchor="middle">Strip Solution</text>
+    <text x="162" y="76" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">↑ ANODIZE REMOVAL</text>
+    <text x="162" y="96" fill="#5DCAA5" font-size="7" text-anchor="middle">PART IN BASKET</text>
+  </svg>`
+};
+
+// ========== DATA ==========
+const defaultData = [
+  {
+    id: "RECT-001", name: "Nickel Strike", status: "service",
+    voltMin: 4, voltMax: 8, currMin: 100, currMax: 500,
+    calibNo: "CAL-2024-NS-001", calibDate: "2024-06-15", dueDate: "2025-06-15",
+    damage: "None"
+  },
+  {
+    id: "RECT-002", name: "LHE Cadmium", status: "unservice",
+    voltMin: 6, voltMax: 12, currMin: 50, currMax: 300,
+    calibNo: "CAL-2024-CD-002", calibDate: "2024-03-10", dueDate: "2025-03-10",
+    damage: "Output current unstable — fluctuating beyond ±5%. Transformer suspected. Unit tagged OUT OF SERVICE pending inspection."
+  },
+  {
+    id: "RECT-003", name: "Hard Chrome", status: "service",
+    voltMin: 8, voltMax: 12, currMin: 500, currMax: 3000,
+    calibNo: "CAL-2024-HC-003", calibDate: "2024-09-20", dueDate: "2025-09-20",
+    damage: "None"
+  },
+  {
+    id: "RECT-004", name: "Chromic Acid Anodizing", status: "service",
+    voltMin: 0, voltMax: 40, currMin: 10, currMax: 200,
+    calibNo: "CAL-2024-CA-004", calibDate: "2024-07-05", dueDate: "2025-07-05",
+    damage: "None"
+  },
+  {
+    id: "RECT-005", name: "Stripping Hard Chrome", status: "service",
+    voltMin: 6, voltMax: 18, currMin: 20, currMax: 150,
+    calibNo: "CAL-2024-SA-005", calibDate: "2024-11-01", dueDate: "2025-11-01",
+    damage: "Minor cooling fan noise noted. Monitoring scheduled. Non-critical."
+  }
+];
+
+const defaultLogs = [
+  {
+    id: 1, unitId: "RECT-002", unit: "LHE Cadmium",
+    date: "2025-03-18", severity: "critical",
+    damage: "Output current fluctuating beyond ±5% tolerance. Suspected transformer fault.",
+    reporter: "Ahmad Fauzi", action: "Unit tagged OOS. Electrician notified. Parts ordered.", status: "critical"
+  },
+  {
+    id: 2, unitId: "RECT-005", unit: "Stripping Hard Chrome",
+    date: "2025-04-02", severity: "minor",
+    damage: "Cooling fan making abnormal noise. Possible bearing wear.",
+    reporter: "Budi Santoso", action: "Monitoring in progress. Scheduled for PM next week.", status: "minor"
+  },
+  {
+    id: 3, unitId: "RECT-001", unit: "Nickel Strike",
+    date: "2025-01-15", severity: "resolved",
+    damage: "Voltage meter display malfunction. Reading incorrect values.",
+    reporter: "Siti Rahayu", action: "Display module replaced. Calibration verified.", status: "resolved"
+  }
+];
+
+let rectData = JSON.parse(JSON.stringify(defaultData));
+let logData = JSON.parse(JSON.stringify(defaultLogs));
+
+// ========== STORAGE (window.storage — persistent) ==========
+async function save() {
+  try {
+    await window.storage.set('rectData', JSON.stringify(rectData));
+    await window.storage.set('logData', JSON.stringify(logData));
+    showSaveIndicator();
+  } catch(e) { console.warn('Storage save error:', e); }
+}
+
+async function loadFromStorage() {
+  try {
+    const r = await window.storage.get('rectData');
+    if (r && r.value) rectData = JSON.parse(r.value);
+  } catch(e) {}
+  try {
+    const l = await window.storage.get('logData');
+    if (l && l.value) logData = JSON.parse(l.value);
+  } catch(e) {}
+}
+
+function showSaveIndicator() {
+  const el = document.getElementById('saveIndicator');
+  if (!el) return;
+  el.style.opacity = '1';
+  setTimeout(() => el.style.opacity = '0', 2000);
+}
+
+// ========== DATE UTILS ==========
+function daysUntil(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr);
+  return Math.round((d - today) / 86400000);
+}
+function formatDate(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ========== RENDER CARDS ==========
+function renderCards() {
+  const grid = document.getElementById('rectGrid');
+  grid.innerHTML = '';
+  let inService = 0, unservice = 0, overdue = 0;
+
+  rectData.forEach((r, i) => {
+    if (r.status === 'service') inService++; else unservice++;
+    const days = daysUntil(r.dueDate);
+    if (days < 0) overdue++;
+
+    let dueDateClass = 'ok';
+    let dueDateText = `${formatDate(r.dueDate)}`;
+    if (days < 0) { dueDateClass = 'danger'; dueDateText += ' ⚠ OVERDUE'; }
+    else if (days <= 30) { dueDateClass = 'warn'; dueDateText += ` (${days}d)`; }
+    else { dueDateText += ` (${days}d)`; }
+
+    const voltPct = Math.min(100, Math.round((r.voltMax / 50) * 100));
+
+    const card = document.createElement('div');
+    card.className = `rect-card ${r.status}`;
+    card.innerHTML = `
+      <div class="card-header">
+        <div>
+          <div class="card-id">${r.id}</div>
+          <div class="card-name">${r.name}</div>
+        </div>
+        <div class="status-badge ${r.status}">
+          <div class="status-dot"></div>
+          ${r.status === 'service' ? 'IN SERVICE' : 'UNSERVICE'}
+        </div>
+      </div>
+      <div class="sketch-area">${sketches[r.name] || ''}</div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Voltage Range</div>
+            <div class="info-value highlight">${r.voltMin}–${r.voltMax} VDC</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Current Range</div>
+            <div class="info-value highlight">${r.currMin}–${r.currMax} A</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Calib. Reg. No.</div>
+            <div class="info-value">${r.calibNo}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Calibration Date</div>
+            <div class="info-value">${formatDate(r.calibDate)}</div>
+          </div>
+          <div class="info-item" style="grid-column:span 2">
+            <div class="info-label">Due Date Calibration</div>
+            <div class="info-value ${dueDateClass}">${dueDateText}</div>
+          </div>
+        </div>
+        <div class="voltage-bar">
+          <div class="vb-label"><span>Voltage Range Indicator</span><span>${r.voltMax}V</span></div>
+          <div class="vb-track"><div class="vb-fill" style="width:${voltPct}%"></div></div>
+        </div>
+        <div class="damage-box ${r.damage === 'None' ? 'none' : ''}">
+          <div class="dmg-label">⚠ Damage Detail</div>
+          <div class="dmg-text">${r.damage || 'No damage reported'}</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn primary" onclick="openEdit(${i})">✎ Edit Data</button>
+        <button class="btn danger" onclick="openAddLogForUnit('${r.id}','${r.name}')">+ Log Kerusakan</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('sumService').textContent = inService;
+  document.getElementById('sumUnservice').textContent = unservice;
+  document.getElementById('sumOverdue').textContent = overdue;
+}
+
+// ========== EDIT MODAL ==========
+function openEdit(i) {
+  const r = rectData[i];
+  document.getElementById('editModalTitle').textContent = `Edit — ${r.name}`;
+  document.getElementById('editIndex').value = i;
+  document.getElementById('editStatus').value = r.status;
+  document.getElementById('editVoltMin').value = r.voltMin;
+  document.getElementById('editVoltMax').value = r.voltMax;
+  document.getElementById('editCurrMin').value = r.currMin;
+  document.getElementById('editCurrMax').value = r.currMax;
+  document.getElementById('editCalibNo').value = r.calibNo;
+  document.getElementById('editCalibDate').value = r.calibDate;
+  document.getElementById('editDueDate').value = r.dueDate;
+  document.getElementById('editDamage').value = r.damage;
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
+async function saveEdit() {
+  const i = parseInt(document.getElementById('editIndex').value);
+  rectData[i].status = document.getElementById('editStatus').value;
+  rectData[i].voltMin = parseFloat(document.getElementById('editVoltMin').value);
+  rectData[i].voltMax = parseFloat(document.getElementById('editVoltMax').value);
+  rectData[i].currMin = parseFloat(document.getElementById('editCurrMin').value);
+  rectData[i].currMax = parseFloat(document.getElementById('editCurrMax').value);
+  rectData[i].calibNo = document.getElementById('editCalibNo').value;
+  rectData[i].calibDate = document.getElementById('editCalibDate').value;
+  rectData[i].dueDate = document.getElementById('editDueDate').value;
+  rectData[i].damage = document.getElementById('editDamage').value;
+  await save(); closeEditModal(); renderCards();
+}
+
+// ========== LOG MODAL ==========
+function populateUnitFilter() {
+  const sel = document.getElementById('filterUnit');
+  const logSel = document.getElementById('logUnit');
+  sel.innerHTML = '<option value="">All Units</option>';
+  logSel.innerHTML = '';
+  rectData.forEach(r => {
+    sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+    logSel.innerHTML += `<option value="${r.id}" data-name="${r.name}">${r.name}</option>`;
+  });
+}
+
+function openAddLog() {
+  document.getElementById('logEditId').value = '';
+  document.getElementById('logUnit').selectedIndex = 0;
+  document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('logDamage').value = '';
+  document.getElementById('logReporter').value = '';
+  document.getElementById('logAction').value = '';
+  document.getElementById('logStatus').value = 'minor';
+  document.getElementById('logSeverity').value = 'minor';
+  document.getElementById('logModal').classList.add('open');
+}
+function openAddLogForUnit(unitId, unitName) {
+  openAddLog();
+  const sel = document.getElementById('logUnit');
+  for (let o of sel.options) { if (o.value === unitId) { sel.value = unitId; break; } }
+}
+function closeLogModal() { document.getElementById('logModal').classList.remove('open'); }
+async function saveLog() {
+  const sel = document.getElementById('logUnit');
+  const opt = sel.options[sel.selectedIndex];
+  const editId = document.getElementById('logEditId').value;
+  const entry = {
+    id: editId ? parseInt(editId) : Date.now(),
+    unitId: sel.value,
+    unit: opt ? opt.dataset.name || opt.text : '',
+    date: document.getElementById('logDate').value,
+    severity: document.getElementById('logSeverity').value,
+    damage: document.getElementById('logDamage').value,
+    reporter: document.getElementById('logReporter').value,
+    action: document.getElementById('logAction').value,
+    status: document.getElementById('logStatus').value
+  };
+  if (editId) {
+    const idx = logData.findIndex(l => l.id === parseInt(editId));
+    if (idx >= 0) logData[idx] = entry;
+  } else {
+    logData.unshift(entry);
+  }
+  await save(); closeLogModal(); renderLogbook();
+}
+
+async function deleteLog(id) {
+  if (!confirm('Delete this log entry?')) return;
+  logData = logData.filter(l => l.id !== id);
+  await save(); renderLogbook();
+}
+
+function editLog(id) {
+  const log = logData.find(l => l.id === id);
+  if (!log) return;
+  document.getElementById('logEditId').value = log.id;
+  document.getElementById('logUnit').value = log.unitId;
+  document.getElementById('logDate').value = log.date;
+  document.getElementById('logSeverity').value = log.severity;
+  document.getElementById('logDamage').value = log.damage;
+  document.getElementById('logReporter').value = log.reporter;
+  document.getElementById('logAction').value = log.action;
+  document.getElementById('logStatus').value = log.status;
+  document.getElementById('logModal').classList.add('open');
+}
+
+function viewLog(id) {
+  const log = logData.find(l => l.id === id);
+  if (!log) return;
+  const severityLabel = {critical:'Critical',minor:'Minor',resolved:'Resolved'}[log.severity] || log.severity;
+  document.getElementById('viewModalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Unit</div><div style="font-family:monospace;">${log.unit}</div></div>
+      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Date</div><div style="font-family:monospace;">${formatDate(log.date)}</div></div>
+      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Severity</div><span class="tag tag-${log.severity}">${severityLabel}</span></div>
+      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Reporter</div><div>${log.reporter}</div></div>
+    </div>
+    <div style="margin-bottom:12px;"><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:4px;">Damage Detail</div><div style="background:#0A0E13;border:1px solid #30363D;border-radius:6px;padding:10px;font-size:13px;line-height:1.6;">${log.damage}</div></div>
+    <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:4px;">Action Taken</div><div style="background:#0A0E13;border:1px solid #30363D;border-radius:6px;padding:10px;font-size:13px;line-height:1.6;">${log.action || '—'}</div></div>
+  `;
+  document.getElementById('viewModal').classList.add('open');
+}
+
+// ========== RENDER LOGBOOK ==========
+function renderLogbook() {
+  const filterUnit = document.getElementById('filterUnit').value;
+  const filterSev = document.getElementById('filterSeverity').value;
+  const tbody = document.getElementById('logbookBody');
+  let filtered = logData.filter(l => {
+    if (filterUnit && l.unitId !== filterUnit) return false;
+    if (filterSev && l.status !== filterSev) return false;
+    return true;
+  });
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No log entries found.</td></tr>';
+    return;
+  }
+  const sevLabel = {critical:'Critical',minor:'Minor',resolved:'Resolved'};
+  tbody.innerHTML = filtered.map(l => `
+    <tr>
+      <td style="font-family:monospace;color:#8B949E;font-size:11px;">${formatDate(l.date)}</td>
+      <td><strong style="font-size:12px;">${l.unit}</strong></td>
+      <td><span class="tag tag-${l.severity}">${sevLabel[l.severity]||l.severity}</span></td>
+      <td style="max-width:200px;line-height:1.5;">${l.damage.length > 80 ? l.damage.slice(0,80)+'…' : l.damage}</td>
+      <td style="color:#8B949E;">${l.reporter}</td>
+      <td style="max-width:120px;color:#8B949E;font-size:11px;">${(l.action||'—').slice(0,60)}</td>
+      <td><span class="tag tag-${l.status}">${sevLabel[l.status]||l.status}</span></td>
+      <td>
+        <div class="log-action-btns">
+          <button class="icon-btn" title="View" onclick="viewLog(${l.id})">👁</button>
+          <button class="icon-btn" title="Edit" onclick="editLog(${l.id})">✎</button>
+          <button class="icon-btn" title="Delete" onclick="deleteLog(${l.id})" style="color:#F85149;">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ========== CSV EXPORT ==========
+function csvEscape(val) {
+  if (val === null || val === undefined) return '';
+  let s = String(val);
+  if (s.includes('"') || s.includes(',') || s.includes('\n') || s.includes('\r')) {
+    s = '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function downloadCSV(filename, rows) {
+  const csvContent = rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportRectifierCSV() {
+  const headers = [
+    'ID', 'Nama', 'Status', 'Voltage Min (V)', 'Voltage Max (V)',
+    'Current Min (A)', 'Current Max (A)', 'No. Reg Kalibrasi',
+    'Tanggal Kalibrasi', 'Due Date Kalibrasi', 'Sisa Hari', 'Detail Kerusakan'
+  ];
+  const rows = [headers];
+  rectData.forEach(r => {
+    rows.push([
+      r.id,
+      r.name,
+      r.status === 'service' ? 'In Service' : 'Unservice',
+      r.voltMin,
+      r.voltMax,
+      r.currMin,
+      r.currMax,
+      r.calibNo,
+      r.calibDate,
+      r.dueDate,
+      daysUntil(r.dueDate),
+      r.damage
+    ]);
+  });
+  downloadCSV('rectifier_data_' + new Date().toISOString().split('T')[0] + '.csv', rows);
+}
+
+function exportLogbookCSV() {
+  const headers = [
+    'Date', 'Rectifier Unit', 'Unit ID', 'Severity', 'Damage Detail',
+    'Reported By', 'Action Taken', 'Status'
+  ];
+  const rows = [headers];
+  const sevLabel = {critical:'Critical', minor:'Minor', resolved:'Resolved'};
+  logData.forEach(l => {
+    rows.push([
+      l.date,
+      l.unit,
+      l.unitId,
+      sevLabel[l.severity] || l.severity,
+      l.damage,
+      l.reporter,
+      l.action,
+      sevLabel[l.status] || l.status
+    ]);
+  });
+  downloadCSV('logbook_' + new Date().toISOString().split('T')[0] + '.csv', rows);
+}
+
+// ========== CLOCK ==========
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) + ' ' +
+    now.toLocaleTimeString('id-ID');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ========== CLOSE MODALS ON BG CLICK ==========
+document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEditModal(); });
+document.getElementById('logModal').addEventListener('click', function(e){ if(e.target===this) closeLogModal(); });
+document.getElementById('viewModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+
+// ========== INIT ==========
+(async () => {
+  await loadFromStorage();
+  populateUnitFilter();
+  renderCards();
+  renderLogbook();
+})();
+</script>
+</body>
+</html>
