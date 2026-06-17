@@ -29,7 +29,41 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+  /* LOADING SPINNER STYLE */
+  .spinner-overlay {
+    display: none; /* Tersembunyi secara default */
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    backdrop-filter: blur(2px);
+  }
 
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--border);
+    border-top: 5px solid var(--blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: var(--mono);
+    color: var(--text);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
   /* HEADER */
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 14px; }
@@ -244,7 +278,10 @@
 </div>
 
 <div class="footer">Rectifier Monitoring System v1.1 · Electroplating Facility · Real-time Sheets Sync</div>
-
+<div id="loadingOverlay" class="spinner-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Processing Data...</div>
+</div>
 <script>
 // URL WEB APP GAS ANDA
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwWa-zhq12iprT5ZpnvzrUU9FjChlJ5wjP8jdex4SheQ84oRbZ4sRJBdR25ZR2NEpVbMQ/exec";
@@ -398,10 +435,25 @@ async function saveLog() {
       status: document.getElementById('logSeverity').value === 'resolved' ? 'Resolved' : (document.getElementById('logSeverity').value === 'critical' ? 'Critical' : 'Minor')
     }
   };
-  showLoading(true);
-  await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
-  closeLogModal();
-  fetchData();
+
+  showLoading(true); // Munculkan Spinner
+  try {
+    await fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify(payload) 
+    });
+    
+    // Beri jeda 1 detik agar Google Sheets sempat memproses sebelum kita ambil data baru
+    setTimeout(async () => {
+      closeLogModal();
+      await fetchData(); // fetchData akan otomatis memanggil showLoading(false)
+      showSaveIndicator();
+    }, 1000);
+  } catch (e) {
+    alert("Error saving log.");
+    showLoading(false);
+  }
 }
 
 // ========== RENDER FUNCTIONS ==========
@@ -527,10 +579,20 @@ function renderLogbook() {
 
 // ========== HELPERS ==========
 function showLoading(status) {
-  const el = document.getElementById('saveIndicator');
-  el.textContent = status ? "⌛ Syncing..." : "✔ Data Synced";
-  el.style.opacity = "1";
-  if(!status) setTimeout(() => el.style.opacity = "0", 3000);
+  const elIndicator = document.getElementById('saveIndicator');
+  const elOverlay = document.getElementById('loadingOverlay');
+
+  if (status) {
+    // Saat Loading Dimulai
+    elIndicator.textContent = "⌛ Syncing...";
+    elIndicator.style.opacity = "1";
+    elOverlay.style.display = "flex"; // Tampilkan Spinner
+  } else {
+    // Saat Loading Selesai
+    elIndicator.textContent = "✔ Data Synced";
+    elOverlay.style.display = "none"; // Sembunyikan Spinner
+    setTimeout(() => elIndicator.style.opacity = "0", 3000);
+  }
 }
 
 function daysUntil(dateStr) {
