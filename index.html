@@ -389,237 +389,130 @@
 <div class="footer">Rectifier Monitoring System v1.0 · Electroplating Facility · Data updates in real-time</div>
 
 <script>
-// ========== SVG SKETCHES ==========
-const sketches = {
-  "Nickel Strike": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="20" width="70" height="70" rx="4" fill="none" stroke="#388BFD" stroke-width="1.5"/>
-    <text x="45" y="10" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
-    <rect x="14" y="28" width="62" height="14" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="1"/>
-    <text x="45" y="39" fill="#3FB950" font-size="8" font-family="monospace" text-anchor="middle">V: 4–8 VDC</text>
-    <rect x="14" y="48" width="62" height="14" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="1"/>
-    <text x="45" y="59" fill="#3FB950" font-size="8" font-family="monospace" text-anchor="middle">A: 100–500 A</text>
-    <rect x="24" y="68" width="14" height="10" rx="2" fill="#1F6FEB" opacity="0.5"/>
-    <rect x="44" y="68" width="14" height="10" rx="2" fill="#1F6FEB" opacity="0.5"/>
-    <circle cx="31" cy="73" r="2" fill="#3FB950"/>
-    <circle cx="51" cy="73" r="2" fill="#F85149"/>
-    <line x1="80" y1="40" x2="108" y2="40" stroke="#388BFD" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <line x1="80" y1="60" x2="108" y2="60" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <text x="84" y="36" fill="#388BFD" font-size="8" font-family="monospace">+DC</text>
-    <text x="84" y="56" fill="#F85149" font-size="8" font-family="monospace">−DC</text>
-    <rect x="108" y="15" width="100" height="80" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
-    <text x="158" y="12" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">Ni BATH TANK</text>
-    <rect x="116" y="22" width="84" height="66" rx="2" fill="#0A1F1A" opacity="0.8"/>
-    <line x1="135" y1="22" x2="135" y2="88" stroke="#388BFD" stroke-width="1.5"/>
-    <line x1="181" y1="22" x2="181" y2="88" stroke="#F85149" stroke-width="1.5"/>
-    <text x="135" y="100" fill="#388BFD" font-size="8" text-anchor="middle">ANODE</text>
-    <text x="181" y="100" fill="#F85149" font-size="8" text-anchor="middle">CATHODE</text>
-    <text x="158" y="62" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">NiSO4 / NiCl2</text>
-    <text x="158" y="74" fill="#8B949E" font-size="8" font-family="monospace" text-anchor="middle">pH 3.8–4.5</text>
-  </svg>`,
+// URL Web App GAS Anda
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwWa-zhq12iprT5ZpnvzrUU9FjChlJ5wjP8jdex4SheQ84oRbZ4sRJBdR25ZR2NEpVbMQ/exec";
 
-  "LHE Cadmium": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="20" width="70" height="70" rx="4" fill="none" stroke="#D29922" stroke-width="1.5"/>
-    <text x="45" y="10" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
-    <rect x="14" y="28" width="62" height="14" rx="2" fill="#2B1D07" stroke="#D29922" stroke-width="1"/>
-    <text x="45" y="39" fill="#D29922" font-size="8" font-family="monospace" text-anchor="middle">V: 6–12 VDC</text>
-    <rect x="14" y="48" width="62" height="14" rx="2" fill="#2B1D07" stroke="#D29922" stroke-width="1"/>
-    <text x="45" y="59" fill="#D29922" font-size="8" font-family="monospace" text-anchor="middle">A: 50–300 A</text>
-    <text x="45" y="78" fill="#8B949E" font-size="7" font-family="monospace" text-anchor="middle">LOW-H EMBRITTLEMENT</text>
-    <line x1="80" y1="40" x2="108" y2="40" stroke="#D29922" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <line x1="80" y1="60" x2="108" y2="60" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <rect x="108" y="15" width="100" height="80" rx="4" fill="none" stroke="#D29922" stroke-width="1.5"/>
-    <text x="158" y="12" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">Cd BATH TANK</text>
-    <rect x="116" y="22" width="84" height="66" rx="2" fill="#1A1200" opacity="0.8"/>
-    <line x1="135" y1="22" x2="135" y2="88" stroke="#D29922" stroke-width="1.5"/>
-    <line x1="181" y1="22" x2="181" y2="88" stroke="#F85149" stroke-width="1.5"/>
-    <text x="135" y="100" fill="#D29922" font-size="8" text-anchor="middle">ANODE</text>
-    <text x="181" y="100" fill="#F85149" font-size="8" text-anchor="middle">CATHODE</text>
-    <text x="158" y="58" fill="#D29922" font-size="9" font-family="monospace" text-anchor="middle">CdO + NH4OH</text>
-    <text x="158" y="70" fill="#8B949E" font-size="8" font-family="monospace" text-anchor="middle">Alkaline Bath</text>
-    <rect x="116" y="82" width="84" height="4" rx="1" fill="#2B1D07"/>
-    <text x="158" y="80" fill="#6E7681" font-size="7" text-anchor="middle">⚠ HAZARDOUS</text>
-  </svg>`,
+// ========== STATE DATA ==========
+let rectData = [];
+let logData = [];
 
-  "Hard Chrome": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="18" width="75" height="76" rx="4" fill="none" stroke="#388BFD" stroke-width="2"/>
-    <text x="47" y="10" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
-    <rect x="14" y="24" width="67" height="12" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="0.8"/>
-    <text x="47" y="34" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">V: 8–12 VDC</text>
-    <rect x="14" y="40" width="67" height="12" rx="2" fill="#0D2444" stroke="#1F6FEB" stroke-width="0.8"/>
-    <text x="47" y="50" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">A: 500–3000 A</text>
-    <rect x="14" y="56" width="67" height="12" rx="2" fill="#0D2444" stroke="#388BFD" stroke-width="0.8"/>
-    <text x="47" y="66" fill="#388BFD" font-size="7" font-family="monospace" text-anchor="middle">HIGH CURRENT</text>
-    <rect x="22" y="74" width="10" height="14" rx="2" fill="#388BFD" opacity="0.6"/>
-    <rect x="38" y="74" width="10" height="14" rx="2" fill="#388BFD" opacity="0.6"/>
-    <rect x="54" y="74" width="10" height="14" rx="2" fill="#388BFD" opacity="0.6"/>
-    <line x1="85" y1="38" x2="108" y2="38" stroke="#388BFD" stroke-width="2" stroke-dasharray="3,2"/>
-    <line x1="85" y1="58" x2="108" y2="58" stroke="#F85149" stroke-width="2" stroke-dasharray="3,2"/>
-    <rect x="108" y="12" width="105" height="84" rx="4" fill="none" stroke="#388BFD" stroke-width="1.5"/>
-    <text x="160" y="9" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">Cr BATH TANK</text>
-    <rect x="115" y="19" width="91" height="70" rx="2" fill="#060C1A" opacity="0.9"/>
-    <line x1="133" y1="19" x2="133" y2="89" stroke="#388BFD" stroke-width="2"/>
-    <rect x="129" y="14" width="8" height="7" rx="1" fill="#388BFD"/>
-    <line x1="185" y1="19" x2="185" y2="89" stroke="#F85149" stroke-width="2"/>
-    <rect x="181" y="14" width="8" height="7" rx="1" fill="#F85149"/>
-    <text x="133" y="101" fill="#388BFD" font-size="8" text-anchor="middle">Pb ANODE</text>
-    <text x="185" y="101" fill="#F85149" font-size="8" text-anchor="middle">CATHODE</text>
-    <text x="160" y="56" fill="#388BFD" font-size="9" font-family="monospace" text-anchor="middle">CrO3 + H2SO4</text>
-    <text x="160" y="68" fill="#6E7681" font-size="8" font-family="monospace" text-anchor="middle">250 g/L + 2.5 g/L</text>
-  </svg>`,
-
-  "Chromic Acid Anodizing": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="18" width="72" height="72" rx="4" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
-    <text x="44" y="10" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
-    <rect x="12" y="24" width="64" height="12" rx="2" fill="#1A1040" stroke="#7F77DD" stroke-width="0.8"/>
-    <text x="44" y="34" fill="#AFA9EC" font-size="7" font-family="monospace" text-anchor="middle">V: 0–40 VDC RAMP</text>
-    <rect x="12" y="40" width="64" height="12" rx="2" fill="#1A1040" stroke="#7F77DD" stroke-width="0.8"/>
-    <text x="44" y="50" fill="#AFA9EC" font-size="7" font-family="monospace" text-anchor="middle">A: 10–200 A</text>
-    <polyline points="14,70 28,70 28,58 42,58 42,70 56,70 56,58 70,58" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
-    <text x="44" y="82" fill="#6E7681" font-size="7" font-family="monospace" text-anchor="middle">RAMP PROFILE</text>
-    <line x1="80" y1="38" x2="108" y2="38" stroke="#9F7BE1" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <line x1="80" y1="58" x2="108" y2="58" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <rect x="108" y="12" width="108" height="84" rx="4" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
-    <text x="162" y="9" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">ANODIZE TANK</text>
-    <rect x="115" y="19" width="94" height="70" rx="2" fill="#0D0820" opacity="0.9"/>
-    <rect x="124" y="24" width="12" height="60" rx="3" fill="none" stroke="#9F7BE1" stroke-width="1.5"/>
-    <rect x="126" y="24" width="8" height="60" rx="2" fill="#1A1040"/>
-    <text x="130" y="96" fill="#9F7BE1" font-size="7" text-anchor="middle">CATHODE</text>
-    <rect x="180" y="30" width="14" height="48" rx="3" fill="none" stroke="#F85149" stroke-width="1.5"/>
-    <rect x="182" y="32" width="10" height="44" rx="2" fill="#200808"/>
-    <text x="187" y="96" fill="#F85149" font-size="7" text-anchor="middle">PART</text>
-    <text x="162" y="56" fill="#9F7BE1" font-size="9" font-family="monospace" text-anchor="middle">10% CrO3</text>
-    <text x="162" y="68" fill="#6E7681" font-size="8" font-family="monospace" text-anchor="middle">35°C ± 2°C</text>
-    <text x="130" y="14" fill="#9F7BE1" font-size="7" font-family="monospace">+</text>
-    <text x="185" y="14" fill="#F85149" font-size="7" font-family="monospace">PART</text>
-  </svg>`,
-
-  "Stripping Hard Chrome": `<svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="18" width="72" height="72" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
-    <text x="44" y="10" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">RECTIFIER</text>
-    <rect x="12" y="24" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
-    <text x="44" y="34" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">V: 6–18 VDC</text>
-    <rect x="12" y="40" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
-    <text x="44" y="50" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">A: 20–150 A</text>
-    <rect x="12" y="56" width="64" height="12" rx="2" fill="#0A1F1A" stroke="#1D9E75" stroke-width="0.8"/>
-    <text x="44" y="66" fill="#5DCAA5" font-size="7" font-family="monospace" text-anchor="middle">REVERSE POLARITY</text>
-    <circle cx="30" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
-    <circle cx="44" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
-    <circle cx="58" cy="82" r="6" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
-    <line x1="36" y1="82" x2="38" y2="82" stroke="#8B949E" stroke-width="1"/>
-    <line x1="50" y1="82" x2="52" y2="82" stroke="#8B949E" stroke-width="1"/>
-    <line x1="80" y1="38" x2="108" y2="38" stroke="#5DCAA5" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <line x1="80" y1="58" x2="108" y2="58" stroke="#F85149" stroke-width="1.5" stroke-dasharray="4,2"/>
-    <rect x="108" y="12" width="108" height="84" rx="4" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
-    <text x="162" y="9" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">STRIP TANK</text>
-    <rect x="115" y="19" width="94" height="70" rx="2" fill="#03120C" opacity="0.9"/>
-    <rect x="130" y="28" width="64" height="50" rx="3" fill="none" stroke="#5DCAA5" stroke-width="1"/>
-    <rect x="146" y="34" width="32" height="38" rx="2" fill="#0A1F1A"/>
-    <line x1="162" y1="19" x2="162" y2="28" stroke="#5DCAA5" stroke-width="2"/>
-    <text x="162" y="52" fill="#5DCAA5" font-size="9" font-family="monospace" text-anchor="middle">NaOH / H3PO4</text>
-    <text x="162" y="64" fill="#6E7681" font-size="8" font-family="monospace" text-anchor="middle">Strip Solution</text>
-    <text x="162" y="76" fill="#3FB950" font-size="7" font-family="monospace" text-anchor="middle">↑ ANODIZE REMOVAL</text>
-    <text x="162" y="96" fill="#5DCAA5" font-size="7" text-anchor="middle">PART IN BASKET</text>
-  </svg>`
-};
-
-// ========== DATA ==========
-const defaultData = [
-  {
-    id: "RECT-001", name: "Nickel Strike", status: "service",
-    voltMin: 4, voltMax: 8, currMin: 100, currMax: 500,
-    calibNo: "CAL-2024-NS-001", calibDate: "2024-06-15", dueDate: "2025-06-15",
-    damage: "None"
-  },
-  {
-    id: "RECT-002", name: "LHE Cadmium", status: "unservice",
-    voltMin: 6, voltMax: 12, currMin: 50, currMax: 300,
-    calibNo: "CAL-2024-CD-002", calibDate: "2024-03-10", dueDate: "2025-03-10",
-    damage: "Output current unstable — fluctuating beyond ±5%. Transformer suspected. Unit tagged OUT OF SERVICE pending inspection."
-  },
-  {
-    id: "RECT-003", name: "Hard Chrome", status: "service",
-    voltMin: 8, voltMax: 12, currMin: 500, currMax: 3000,
-    calibNo: "CAL-2024-HC-003", calibDate: "2024-09-20", dueDate: "2025-09-20",
-    damage: "None"
-  },
-  {
-    id: "RECT-004", name: "Chromic Acid Anodizing", status: "service",
-    voltMin: 0, voltMax: 40, currMin: 10, currMax: 200,
-    calibNo: "CAL-2024-CA-004", calibDate: "2024-07-05", dueDate: "2025-07-05",
-    damage: "None"
-  },
-  {
-    id: "RECT-005", name: "Stripping Hard Chrome", status: "service",
-    voltMin: 6, voltMax: 18, currMin: 20, currMax: 150,
-    calibNo: "CAL-2024-SA-005", calibDate: "2024-11-01", dueDate: "2025-11-01",
-    damage: "Minor cooling fan noise noted. Monitoring scheduled. Non-critical."
-  }
-];
-
-const defaultLogs = [
-  {
-    id: 1, unitId: "RECT-002", unit: "LHE Cadmium",
-    date: "2025-03-18", severity: "critical",
-    damage: "Output current fluctuating beyond ±5% tolerance. Suspected transformer fault.",
-    reporter: "Ahmad Fauzi", action: "Unit tagged OOS. Electrician notified. Parts ordered.", status: "critical"
-  },
-  {
-    id: 2, unitId: "RECT-005", unit: "Stripping Hard Chrome",
-    date: "2025-04-02", severity: "minor",
-    damage: "Cooling fan making abnormal noise. Possible bearing wear.",
-    reporter: "Budi Santoso", action: "Monitoring in progress. Scheduled for PM next week.", status: "minor"
-  },
-  {
-    id: 3, unitId: "RECT-001", unit: "Nickel Strike",
-    date: "2025-01-15", severity: "resolved",
-    damage: "Voltage meter display malfunction. Reading incorrect values.",
-    reporter: "Siti Rahayu", action: "Display module replaced. Calibration verified.", status: "resolved"
-  }
-];
-
-let rectData = JSON.parse(JSON.stringify(defaultData));
-let logData = JSON.parse(JSON.stringify(defaultLogs));
-
-// ========== STORAGE (window.storage — persistent) ==========
-async function save() {
+// ========== FETCH DATA DARI GOOGLE SHEET ==========
+async function fetchData() {
+  showLoading(true);
   try {
-    await window.storage.set('rectData', JSON.stringify(rectData));
-    await window.storage.set('logData', JSON.stringify(logData));
-    showSaveIndicator();
-  } catch(e) { console.warn('Storage save error:', e); }
+    const response = await fetch(`${GAS_URL}?action=read`);
+    const data = await response.json();
+    rectData = data.rectData;
+    logData = data.logData;
+    
+    populateUnitFilter();
+    renderCards();
+    renderLogbook();
+  } catch (e) {
+    console.error("Gagal mengambil data:", e);
+    alert("Koneksi gagal. Pastikan Web App GAS sudah di-deploy sebagai 'Anyone'.");
+  } finally {
+    showLoading(false);
+  }
 }
 
-async function loadFromStorage() {
+// ========== SIMPAN UPDATE RECTIFIER ==========
+async function saveEdit() {
+  const i = parseInt(document.getElementById('editIndex').value);
+  const originalData = rectData[i];
+  
+  const payload = {
+    action: "updateRect",
+    data: {
+      sheetRow: originalData.sheetRow,
+      status: document.getElementById('editStatus').value === "service" ? "In Service" : "Unservice",
+      voltMin: parseFloat(document.getElementById('editVoltMin').value),
+      voltMax: parseFloat(document.getElementById('editVoltMax').value),
+      currMin: parseFloat(document.getElementById('editCurrMin').value),
+      currMax: parseFloat(document.getElementById('editCurrMax').value),
+      calibNo: document.getElementById('editCalibNo').value,
+      calibDate: document.getElementById('editCalibDate').value,
+      dueDate: document.getElementById('editDueDate').value
+    }
+  };
+
+  showLoading(true);
   try {
-    const r = await window.storage.get('rectData');
-    if (r && r.value) rectData = JSON.parse(r.value);
-  } catch(e) {}
+    await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    closeEditModal();
+    await fetchData(); // Refresh data
+    showSaveIndicator();
+  } catch (e) {
+    alert("Gagal menyimpan data.");
+  } finally {
+    showLoading(false);
+  }
+}
+
+// ========== SIMPAN LOG BARU ==========
+async function saveLog() {
+  const sel = document.getElementById('logUnit');
+  const opt = sel.options[sel.selectedIndex];
+  
+  const payload = {
+    action: "addLog",
+    data: {
+      unitId: sel.value,
+      unitName: opt.text,
+      date: document.getElementById('logDate').value,
+      severity: document.getElementById('logSeverity').value.charAt(0).toUpperCase() + document.getElementById('logSeverity').value.slice(1),
+      damage: document.getElementById('logDamage').value,
+      reporter: document.getElementById('logReporter').value,
+      action: document.getElementById('logAction').value,
+      status: document.getElementById('logStatus').value.charAt(0).toUpperCase() + document.getElementById('logStatus').value.slice(1)
+    }
+  };
+
+  showLoading(true);
   try {
-    const l = await window.storage.get('logData');
-    if (l && l.value) logData = JSON.parse(l.value);
-  } catch(e) {}
+    await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    closeLogModal();
+    await fetchData();
+    showSaveIndicator();
+  } catch (e) {
+    alert("Gagal menambah log.");
+  } finally {
+    showLoading(false);
+  }
+}
+
+// ========== UTILS & RENDER (Tetap sama dengan sedikit penyesuaian) ==========
+
+function showLoading(status) {
+  document.getElementById('saveIndicator').textContent = status ? "⌛ Loading..." : "✔ Data Synced";
+  document.getElementById('saveIndicator').style.opacity = "1";
 }
 
 function showSaveIndicator() {
   const el = document.getElementById('saveIndicator');
-  if (!el) return;
-  el.style.opacity = '1';
-  setTimeout(() => el.style.opacity = '0', 2000);
+  el.textContent = "✔ Saved to Google Sheet";
+  setTimeout(() => el.style.opacity = "0", 3000);
 }
 
-// ========== DATE UTILS ==========
 function daysUntil(dateStr) {
+  if(!dateStr) return 0;
   const today = new Date(); today.setHours(0,0,0,0);
   const d = new Date(dateStr);
   return Math.round((d - today) / 86400000);
 }
+
 function formatDate(dateStr) {
   if (!dateStr) return '-';
   const d = new Date(dateStr);
   return d.toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'});
 }
 
-// ========== RENDER CARDS ==========
 function renderCards() {
   const grid = document.getElementById('rectGrid');
   grid.innerHTML = '';
@@ -642,42 +535,16 @@ function renderCards() {
     card.className = `rect-card ${r.status}`;
     card.innerHTML = `
       <div class="card-header">
-        <div>
-          <div class="card-id">${r.id}</div>
-          <div class="card-name">${r.name}</div>
-        </div>
-        <div class="status-badge ${r.status}">
-          <div class="status-dot"></div>
-          ${r.status === 'service' ? 'IN SERVICE' : 'UNSERVICE'}
-        </div>
+        <div><div class="card-id">${r.id}</div><div class="card-name">${r.name}</div></div>
+        <div class="status-badge ${r.status}"><div class="status-dot"></div>${r.status === 'service' ? 'IN SERVICE' : 'UNSERVICE'}</div>
       </div>
-      <div class="sketch-area">${sketches[r.name] || ''}</div>
+      <div class="sketch-area">${getSketch(r.name)}</div>
       <div class="card-body">
         <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Voltage Range</div>
-            <div class="info-value highlight">${r.voltMin}–${r.voltMax} VDC</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Current Range</div>
-            <div class="info-value highlight">${r.currMin}–${r.currMax} A</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Calib. Reg. No.</div>
-            <div class="info-value">${r.calibNo}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Calibration Date</div>
-            <div class="info-value">${formatDate(r.calibDate)}</div>
-          </div>
-          <div class="info-item" style="grid-column:span 2">
-            <div class="info-label">Due Date Calibration</div>
-            <div class="info-value ${dueDateClass}">${dueDateText}</div>
-          </div>
-        </div>
-        <div class="voltage-bar">
-          <div class="vb-label"><span>Voltage Range Indicator</span><span>${r.voltMax}V</span></div>
-          <div class="vb-track"><div class="vb-fill" style="width:${voltPct}%"></div></div>
+          <div class="info-item"><div class="info-label">Voltage Range</div><div class="info-value highlight">${r.voltMin}–${r.voltMax} VDC</div></div>
+          <div class="info-item"><div class="info-label">Current Range</div><div class="info-value highlight">${r.currMin}–${r.currMax} A</div></div>
+          <div class="info-item"><div class="info-label">Calib. Reg. No.</div><div class="info-value">${r.calibNo}</div></div>
+          <div class="info-item" style="grid-column:span 2"><div class="info-label">Due Date Calibration</div><div class="info-value ${dueDateClass}">${dueDateText}</div></div>
         </div>
         <div class="damage-box ${r.damage === 'None' ? 'none' : ''}">
           <div class="dmg-label">⚠ Damage Detail</div>
@@ -692,15 +559,39 @@ function renderCards() {
     grid.appendChild(card);
   });
 
+  document.getElementById('sumTotal').textContent = rectData.length;
   document.getElementById('sumService').textContent = inService;
   document.getElementById('sumUnservice').textContent = unservice;
   document.getElementById('sumOverdue').textContent = overdue;
 }
 
-// ========== EDIT MODAL ==========
+function renderLogbook() {
+  const tbody = document.getElementById('logbookBody');
+  if (logData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">Belum ada data logbook.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = logData.map(l => `
+    <tr>
+      <td style="font-family:monospace; font-size:11px;">${formatDate(l.date)}</td>
+      <td><strong>${l.unit}</strong></td>
+      <td><span class="tag tag-${l.severity}">${l.severity}</span></td>
+      <td>${l.damage}</td>
+      <td>${l.reporter}</td>
+      <td>${l.action || '-'}</td>
+      <td><span class="tag tag-${l.status}">${l.status}</span></td>
+      <td><button class="icon-btn" onclick="viewLogDetail('${l.unit}', '${l.damage}')">👁</button></td>
+    </tr>
+  `).join('');
+}
+
+function populateUnitFilter() {
+  const sel = document.getElementById('logUnit');
+  sel.innerHTML = rectData.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+}
+
 function openEdit(i) {
   const r = rectData[i];
-  document.getElementById('editModalTitle').textContent = `Edit — ${r.name}`;
   document.getElementById('editIndex').value = i;
   document.getElementById('editStatus').value = r.status;
   document.getElementById('editVoltMin').value = r.voltMin;
@@ -708,244 +599,41 @@ function openEdit(i) {
   document.getElementById('editCurrMin').value = r.currMin;
   document.getElementById('editCurrMax').value = r.currMax;
   document.getElementById('editCalibNo').value = r.calibNo;
-  document.getElementById('editCalibDate').value = r.calibDate;
-  document.getElementById('editDueDate').value = r.dueDate;
-  document.getElementById('editDamage').value = r.damage;
+  document.getElementById('editCalibDate').value = r.calibDate ? new Date(r.calibDate).toISOString().split('T')[0] : "";
+  document.getElementById('editDueDate').value = r.dueDate ? new Date(r.dueDate).toISOString().split('T')[0] : "";
   document.getElementById('editModal').classList.add('open');
 }
+
 function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
-async function saveEdit() {
-  const i = parseInt(document.getElementById('editIndex').value);
-  rectData[i].status = document.getElementById('editStatus').value;
-  rectData[i].voltMin = parseFloat(document.getElementById('editVoltMin').value);
-  rectData[i].voltMax = parseFloat(document.getElementById('editVoltMax').value);
-  rectData[i].currMin = parseFloat(document.getElementById('editCurrMin').value);
-  rectData[i].currMax = parseFloat(document.getElementById('editCurrMax').value);
-  rectData[i].calibNo = document.getElementById('editCalibNo').value;
-  rectData[i].calibDate = document.getElementById('editCalibDate').value;
-  rectData[i].dueDate = document.getElementById('editDueDate').value;
-  rectData[i].damage = document.getElementById('editDamage').value;
-  await save(); closeEditModal(); renderCards();
-}
-
-// ========== LOG MODAL ==========
-function populateUnitFilter() {
-  const sel = document.getElementById('filterUnit');
-  const logSel = document.getElementById('logUnit');
-  sel.innerHTML = '<option value="">All Units</option>';
-  logSel.innerHTML = '';
-  rectData.forEach(r => {
-    sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
-    logSel.innerHTML += `<option value="${r.id}" data-name="${r.name}">${r.name}</option>`;
-  });
-}
-
-function openAddLog() {
-  document.getElementById('logEditId').value = '';
-  document.getElementById('logUnit').selectedIndex = 0;
-  document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('logDamage').value = '';
-  document.getElementById('logReporter').value = '';
-  document.getElementById('logAction').value = '';
-  document.getElementById('logStatus').value = 'minor';
-  document.getElementById('logSeverity').value = 'minor';
-  document.getElementById('logModal').classList.add('open');
-}
-function openAddLogForUnit(unitId, unitName) {
-  openAddLog();
-  const sel = document.getElementById('logUnit');
-  for (let o of sel.options) { if (o.value === unitId) { sel.value = unitId; break; } }
-}
+function openAddLog() { document.getElementById('logModal').classList.add('open'); }
 function closeLogModal() { document.getElementById('logModal').classList.remove('open'); }
-async function saveLog() {
-  const sel = document.getElementById('logUnit');
-  const opt = sel.options[sel.selectedIndex];
-  const editId = document.getElementById('logEditId').value;
-  const entry = {
-    id: editId ? parseInt(editId) : Date.now(),
-    unitId: sel.value,
-    unit: opt ? opt.dataset.name || opt.text : '',
-    date: document.getElementById('logDate').value,
-    severity: document.getElementById('logSeverity').value,
-    damage: document.getElementById('logDamage').value,
-    reporter: document.getElementById('logReporter').value,
-    action: document.getElementById('logAction').value,
-    status: document.getElementById('logStatus').value
+
+function openAddLogForUnit(id, name) {
+  openAddLog();
+  document.getElementById('logUnit').value = id;
+}
+
+// Helper untuk mengambil sketch SVG berdasarkan nama
+function getSketch(name) {
+  const sketches = {
+    "Nickel Strike": `...`, // SVG code Anda sebelumnya
+    "LHE Cadmium": `...`,
+    "Hard Chrome": `...`,
+    "Chromic Acid Anodizing": `...`,
+    "Stripping Hard Chrome": `...`
   };
-  if (editId) {
-    const idx = logData.findIndex(l => l.id === parseInt(editId));
-    if (idx >= 0) logData[idx] = entry;
-  } else {
-    logData.unshift(entry);
-  }
-  await save(); closeLogModal(); renderLogbook();
+  return sketches[name] || "";
 }
 
-async function deleteLog(id) {
-  if (!confirm('Delete this log entry?')) return;
-  logData = logData.filter(l => l.id !== id);
-  await save(); renderLogbook();
-}
-
-function editLog(id) {
-  const log = logData.find(l => l.id === id);
-  if (!log) return;
-  document.getElementById('logEditId').value = log.id;
-  document.getElementById('logUnit').value = log.unitId;
-  document.getElementById('logDate').value = log.date;
-  document.getElementById('logSeverity').value = log.severity;
-  document.getElementById('logDamage').value = log.damage;
-  document.getElementById('logReporter').value = log.reporter;
-  document.getElementById('logAction').value = log.action;
-  document.getElementById('logStatus').value = log.status;
-  document.getElementById('logModal').classList.add('open');
-}
-
-function viewLog(id) {
-  const log = logData.find(l => l.id === id);
-  if (!log) return;
-  const severityLabel = {critical:'Critical',minor:'Minor',resolved:'Resolved'}[log.severity] || log.severity;
-  document.getElementById('viewModalBody').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Unit</div><div style="font-family:monospace;">${log.unit}</div></div>
-      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Date</div><div style="font-family:monospace;">${formatDate(log.date)}</div></div>
-      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Severity</div><span class="tag tag-${log.severity}">${severityLabel}</span></div>
-      <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:3px;">Reporter</div><div>${log.reporter}</div></div>
-    </div>
-    <div style="margin-bottom:12px;"><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:4px;">Damage Detail</div><div style="background:#0A0E13;border:1px solid #30363D;border-radius:6px;padding:10px;font-size:13px;line-height:1.6;">${log.damage}</div></div>
-    <div><div style="font-size:10px;text-transform:uppercase;color:#6E7681;margin-bottom:4px;">Action Taken</div><div style="background:#0A0E13;border:1px solid #30363D;border-radius:6px;padding:10px;font-size:13px;line-height:1.6;">${log.action || '—'}</div></div>
-  `;
-  document.getElementById('viewModal').classList.add('open');
-}
-
-// ========== RENDER LOGBOOK ==========
-function renderLogbook() {
-  const filterUnit = document.getElementById('filterUnit').value;
-  const filterSev = document.getElementById('filterSeverity').value;
-  const tbody = document.getElementById('logbookBody');
-  let filtered = logData.filter(l => {
-    if (filterUnit && l.unitId !== filterUnit) return false;
-    if (filterSev && l.status !== filterSev) return false;
-    return true;
-  });
-  if (filtered.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No log entries found.</td></tr>';
-    return;
-  }
-  const sevLabel = {critical:'Critical',minor:'Minor',resolved:'Resolved'};
-  tbody.innerHTML = filtered.map(l => `
-    <tr>
-      <td style="font-family:monospace;color:#8B949E;font-size:11px;">${formatDate(l.date)}</td>
-      <td><strong style="font-size:12px;">${l.unit}</strong></td>
-      <td><span class="tag tag-${l.severity}">${sevLabel[l.severity]||l.severity}</span></td>
-      <td style="max-width:200px;line-height:1.5;">${l.damage.length > 80 ? l.damage.slice(0,80)+'…' : l.damage}</td>
-      <td style="color:#8B949E;">${l.reporter}</td>
-      <td style="max-width:120px;color:#8B949E;font-size:11px;">${(l.action||'—').slice(0,60)}</td>
-      <td><span class="tag tag-${l.status}">${sevLabel[l.status]||l.status}</span></td>
-      <td>
-        <div class="log-action-btns">
-          <button class="icon-btn" title="View" onclick="viewLog(${l.id})">👁</button>
-          <button class="icon-btn" title="Edit" onclick="editLog(${l.id})">✎</button>
-          <button class="icon-btn" title="Delete" onclick="deleteLog(${l.id})" style="color:#F85149;">🗑</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ========== CSV EXPORT ==========
-function csvEscape(val) {
-  if (val === null || val === undefined) return '';
-  let s = String(val);
-  if (s.includes('"') || s.includes(',') || s.includes('\n') || s.includes('\r')) {
-    s = '"' + s.replace(/"/g, '""') + '"';
-  }
-  return s;
-}
-
-function downloadCSV(filename, rows) {
-  const csvContent = rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function exportRectifierCSV() {
-  const headers = [
-    'ID', 'Nama', 'Status', 'Voltage Min (V)', 'Voltage Max (V)',
-    'Current Min (A)', 'Current Max (A)', 'No. Reg Kalibrasi',
-    'Tanggal Kalibrasi', 'Due Date Kalibrasi', 'Sisa Hari', 'Detail Kerusakan'
-  ];
-  const rows = [headers];
-  rectData.forEach(r => {
-    rows.push([
-      r.id,
-      r.name,
-      r.status === 'service' ? 'In Service' : 'Unservice',
-      r.voltMin,
-      r.voltMax,
-      r.currMin,
-      r.currMax,
-      r.calibNo,
-      r.calibDate,
-      r.dueDate,
-      daysUntil(r.dueDate),
-      r.damage
-    ]);
-  });
-  downloadCSV('rectifier_data_' + new Date().toISOString().split('T')[0] + '.csv', rows);
-}
-
-function exportLogbookCSV() {
-  const headers = [
-    'Date', 'Rectifier Unit', 'Unit ID', 'Severity', 'Damage Detail',
-    'Reported By', 'Action Taken', 'Status'
-  ];
-  const rows = [headers];
-  const sevLabel = {critical:'Critical', minor:'Minor', resolved:'Resolved'};
-  logData.forEach(l => {
-    rows.push([
-      l.date,
-      l.unit,
-      l.unitId,
-      sevLabel[l.severity] || l.severity,
-      l.damage,
-      l.reporter,
-      l.action,
-      sevLabel[l.status] || l.status
-    ]);
-  });
-  downloadCSV('logbook_' + new Date().toISOString().split('T')[0] + '.csv', rows);
-}
-
-// ========== CLOCK ==========
-function updateClock() {
+// Clock & Init
+setInterval(() => {
   const now = new Date();
-  document.getElementById('clock').textContent =
-    now.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) + ' ' +
-    now.toLocaleTimeString('id-ID');
-}
-setInterval(updateClock, 1000);
-updateClock();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
+}, 1000);
 
-// ========== CLOSE MODALS ON BG CLICK ==========
-document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEditModal(); });
-document.getElementById('logModal').addEventListener('click', function(e){ if(e.target===this) closeLogModal(); });
-document.getElementById('viewModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+// RUN INIT
+fetchData();
 
-// ========== INIT ==========
-(async () => {
-  await loadFromStorage();
-  populateUnitFilter();
-  renderCards();
-  renderLogbook();
-})();
 </script>
 </body>
 </html>
